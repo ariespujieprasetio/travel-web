@@ -4,7 +4,7 @@ import { useAuthStore } from '../store/authStore';
 import { IpWhitelistEntry } from './dashboardApi';
 
 // API URL
-const API_URL = process.env.NEXT_PUBLIC_BACKEND || 'http://localhost:5600';
+const API_URL = process.env.NEXT_PUBLIC_BACKEND || 'https://backend.velutara.com';
 
 // Helper function to get auth header
 const getAuthHeader = () => {
