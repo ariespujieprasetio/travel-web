@@ -3,7 +3,7 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 import { User } from '../types';
 
 // API base URL - update this to match your backend
-const API_URL = process.env.NEXT_PUBLIC_BACKEND || 'http://localhost:5600';
+const API_URL = process.env.NEXT_PUBLIC_BACKEND || 'https://backend.velutara.com';
 
 interface AuthState {
     token: string | null;
