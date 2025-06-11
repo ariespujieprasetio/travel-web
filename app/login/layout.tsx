@@ -1,11 +1,15 @@
-import React from 'react'
+// RootLayout.tsx
+import React from 'react';
 
 export default function RootLayout({
-    children,
+  children,
 }: Readonly<{
-    children: React.ReactNode;
+  children: React.ReactNode;
 }>) {
-    return (
-        <body>{children}</body>
-    )
+  return (
+    <>
+      {/* Your layout components, wrappers, or structure */}
+      {children}
+    </>
+  );
 }
