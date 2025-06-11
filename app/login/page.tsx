@@ -2,12 +2,18 @@
 
 import { useState, useEffect, useRef } from 'react'
 import React from 'react'
-import { motion, AnimatePresence, useAnimation  } from 'framer-motion'
+import { motion, AnimatePresence, useAnimation } from 'framer-motion'
 import GradientButton from '@/src/components/GradientButton'
 import LogoIcon from '@/src/LogoIcon'
 import useAuth from '@/src/hooks/useAuth'
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
+
+declare global {
+  interface Window {
+    gapi: any;
+  }
+}
 
 const testimonials = [
   {
@@ -48,32 +54,42 @@ const testimonials = [
 ];
 
 export default function LoginPage() {
-  // Auth state
-  const [isLogin, setIsLogin] = useState(true)
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [name, setName] = useState('')
-  const [rememberMe, setRememberMe] = useState(false)
-  const [passwordVisible, setPasswordVisible] = useState(false)
+  const [isLogin, setIsLogin] = useState(true);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
+  const [passwordVisible, setPasswordVisible] = useState(false);
 
   const { login, signup, isLoading, error, clearError } = useAuth({
     redirectIfAuthenticated: '/dashboard' // Redirect to dashboard if already logged in
-  })
+  });
+
+  const router = useRouter();
 
   // Check URL for signup parameter
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const urlParams = new URLSearchParams(window.location.search)
+      const urlParams = new URLSearchParams(window.location.search);
       if (urlParams.get('signup') === 'true') {
-        setIsLogin(false)
+        setIsLogin(false);
       }
     }
-  }, [])
+  }, []);
 
   // Clear errors when switching between login/signup
   useEffect(() => {
-    clearError()
-  }, [isLogin, clearError])
+    clearError();
+  }, [isLogin, clearError]);
+
+  // Check token in localStorage when the page is loaded
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+    if (token) {
+      // If token is found, redirect to the dashboard
+      router.push("/dashboard");
+    }
+  }, [router]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -84,84 +100,120 @@ export default function LoginPage() {
         window.location.replace('/dashboard');
       }
     } else {
-      const success = await signup(email, password, rememberMe, name,);
+      const success = await signup(email, password, rememberMe, name);
       if (success) {
         window.location.replace('/dashboard');
       }
     }
   };
+
   const togglePasswordVisibility = (): void => {
-    setPasswordVisible(!passwordVisible)
-  }
-
-  const router = useRouter();
-
-  // Ambil token dari URL setelah login
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get("token");
-    if (token) {
-      localStorage.setItem("authToken", token); // Simpan token
-      router.push("/dashboard"); // Arahkan ke halaman dashboard
-    }
-  }, []);
-
-  const handleGoogleAuth = () => {
-    window.location.href = "https://velutara.com/auth/google/callback";
+    setPasswordVisible(!passwordVisible);
   };
 
+  // Store token in localStorage after Google login
+  // useEffect(() => {
+  //   const urlParams = new URLSearchParams(window.location.search);
+  //   const token = urlParams.get("token");
+  //   if (token) {
+  //     localStorage.setItem("authToken", token); // Save the token to localStorage
+  //     router.push("/dashboard"); // Redirect to the dashboard
+  //   }
+  // }, [router]);
 
-  // create slider testimonials
-  const cardWidth = 340
-  const gap = 24
-  const totalCardWidth = cardWidth + gap
+const handleGoogleLogin = async () => {
+  try {
+    // Make sure `gapi.auth2` is available
+    const GoogleAuth = window.gapi.auth2.getAuthInstance();
+    const googleUser = await GoogleAuth.signIn();
+    const token = googleUser.getAuthResponse().id_token;
 
-  const [index, setIndex] = useState(0)
-  const controls = useAnimation()
-  const intervalRef = useRef<NodeJS.Timeout | null>(null)
+    console.log('Google token:', token);
+
+    // Send the token to your backend for login or registration
+    window.location.href = `https://velutara.com/auth/google/callback?token=${token}&action=${isLogin ? 'login' : 'register'}`;
+  } catch (error) {
+    console.error('Google login error:', error);
+  }
+};
+
+useEffect(() => {
+  const loadGapiScript = () => {
+    const script = document.createElement('script');
+    script.src = 'https://apis.google.com/js/platform.js';
+    script.async = true;
+    script.onload = () => {
+      window.gapi.load("auth2", () => {
+        window.gapi.auth2.init({
+          client_id: "835817856194-28jpgd4j0rc8o43rum7k7e3uftaf2177.apps.googleusercontent.com", // Replace with your Google Client ID
+        });
+      });
+    };
+    document.head.appendChild(script);
+  };
+
+  loadGapiScript();
+
+  return () => {
+    const script = document.querySelector('script[src="https://apis.google.com/js/platform.js"]');
+    if (script) {
+      script.remove();
+    }
+  };
+}, []);
+
+
+  // Create slider testimonials
+  const cardWidth = 340;
+  const gap = 24;
+  const totalCardWidth = cardWidth + gap;
+
+  const [index, setIndex] = useState(0);
+  const controls = useAnimation();
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const slideTo = (newIndex: number) => {
-    setIndex(newIndex)
-    controls.start({ x: -newIndex * totalCardWidth })
-  }
+    setIndex(newIndex);
+    controls.start({ x: -newIndex * totalCardWidth });
+  };
 
   const handlePrev = () => {
-    const newIndex = index === 0 ? testimonials.length - 1 : index - 1
-    slideTo(newIndex)
-    resetAutoSlide()
-  }
+    const newIndex = index === 0 ? testimonials.length - 1 : index - 1;
+    slideTo(newIndex);
+    resetAutoSlide();
+  };
 
   const handleNext = () => {
-    const newIndex = (index + 1) % testimonials.length
-    slideTo(newIndex)
-    resetAutoSlide()
-  }
+    const newIndex = (index + 1) % testimonials.length;
+    slideTo(newIndex);
+    resetAutoSlide();
+  };
 
   const startAutoSlide = () => {
     intervalRef.current = setInterval(() => {
-      setIndex(prev => {
-        const nextIndex = (prev + 1) % testimonials.length
-        controls.start({ x: -nextIndex * totalCardWidth })
-        return nextIndex
-      })
-    }, 4000)
-  }
+      setIndex((prev) => {
+        const nextIndex = (prev + 1) % testimonials.length;
+        controls.start({ x: -nextIndex * totalCardWidth });
+        return nextIndex;
+      });
+    }, 4000);
+  };
 
   const resetAutoSlide = () => {
     if (intervalRef.current) {
-      clearInterval(intervalRef.current)
+      clearInterval(intervalRef.current);
     }
-    startAutoSlide()
-  }
+    startAutoSlide();
+  };
 
   useEffect(() => {
-    startAutoSlide()
+    startAutoSlide();
     return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current)
-    }
-  }, [])
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, []);
 
-    return (
+  return (
     <div className="flex min-h-screen overflow-hidden">
       {/* Left side with background image */}
       <div className="hidden md:flex md:w-1/2 relative bg-gradient-to-br from-purple-600 to-indigo-700 items-center justify-center">
@@ -177,50 +229,28 @@ export default function LoginPage() {
         </div>
 
         <div className="relative z-10 max-w-md text-white px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
             <div className="mb-6 flex items-center">
               <LogoIcon width={40} height={40} color="white" />
               <h1 className="ml-3 text-3xl font-bold">VELUTARA</h1>
             </div>
             <h2 className="text-3xl font-bold mb-6">Your AI Travel Companion</h2>
             <p className="text-purple-100 text-lg mb-8">
-              Join thousands of travelers who plan better trips with personalized recommendations,
-              custom itineraries, and expert travel advice.
+              Join thousands of travelers who plan better trips with personalized recommendations, custom itineraries, and expert travel advice.
             </p>
             <div className="relative w-full overflow-hidden py-8 px-6">
               {/* Navigation buttons */}
-              <button
-                onClick={handlePrev}
-                className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 p-2 rounded-full z-10"
-              >
+              <button onClick={handlePrev} className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 p-2 rounded-full z-10">
                 <ChevronLeft className="text-white" />
               </button>
-              <button
-                onClick={handleNext}
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 p-2 rounded-full z-10"
-              >
+              <button onClick={handleNext} className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 p-2 rounded-full z-10">
                 <ChevronRight className="text-white" />
               </button>
 
               <div className="overflow-hidden w-full">
-                <motion.div
-                  animate={controls}
-                  transition={{ duration: 0.5 }}
-                  className="flex gap-6"
-                  style={{
-                    width: `${testimonials.length * totalCardWidth}px`,
-                  }}
-                >
+                <motion.div animate={controls} transition={{ duration: 0.5 }} className="flex gap-6" style={{ width: `${testimonials.length * totalCardWidth}px` }}>
                   {testimonials.map((t, i) => (
-                    <div
-                      key={i}
-                      className="min-w-[300px] max-w-[340px] bg-white/10 backdrop-blur-sm p-4 rounded-xl shadow-lg text-white flex-shrink-0"
-                      style={{ width: `${cardWidth}px` }}
-                    >
+                    <div key={i} className="min-w-[300px] max-w-[340px] bg-white/10 backdrop-blur-sm p-4 rounded-xl shadow-lg text-white flex-shrink-0" style={{ width: `${cardWidth}px` }}>
                       <div className="flex items-center mb-3">
                         <div className="w-10 h-10 rounded-full bg-purple-200 flex items-center justify-center text-purple-700 font-bold text-lg">
                           {t.initials}
@@ -228,18 +258,11 @@ export default function LoginPage() {
                         <div className="ml-3">
                           <p className="font-medium text-white">{t.name}</p>
                           <div className="flex">
-                            {Array(t.rating)
-                              .fill(null)
-                              .map((_, i) => (
-                                <svg
-                                  key={i}
-                                  className="w-4 h-4 text-yellow-300"
-                                  fill="currentColor"
-                                  viewBox="0 0 20 20"
-                                >
-                                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118l-2.8-2.034c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                </svg>
-                              ))}
+                            {Array(t.rating).fill(null).map((_, i) => (
+                              <svg key={i} className="w-4 h-4 text-yellow-300" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118l-2.8-2.034c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                              </svg>
+                            ))}
                           </div>
                         </div>
                       </div>
@@ -285,7 +308,6 @@ export default function LoginPage() {
 
           {/* Tab switching */}
           <div className="bg-gray-100 rounded-lg p-1 mb-8 flex relative">
-            {/* Animated highlight */}
             <motion.div
               className="absolute top-1 bottom-1 rounded-md bg-white shadow-sm z-0"
               initial={false}
@@ -396,7 +418,6 @@ export default function LoginPage() {
                       id="password"
                       name="password"
                       type={passwordVisible ? "text" : "password"}
-                      autoComplete={isLogin ? "current-password" : "new-password"}
                       value={password}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
                       required
@@ -480,7 +501,7 @@ export default function LoginPage() {
 
                 <button
                   type="button"
-                  onClick={handleGoogleAuth}
+                  onClick={handleGoogleLogin}
                   className="mt-6 w-full inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm bg-white hover:bg-gray-50 transition duration-150"
                 >
                   <svg className="h-5 w-5 mr-2" viewBox="0 0 48 48">
@@ -506,34 +527,8 @@ export default function LoginPage() {
               </form>
             </motion.div>
           </AnimatePresence>
-
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
-            className="mt-6 text-center text-sm text-gray-600"
-          >
-            {isLogin ? "Don't have an account? " : "Already have an account? "}
-            <button
-              onClick={() => setIsLogin(!isLogin)}
-              className="font-medium text-purple-600 hover:text-purple-700"
-            >
-              {isLogin ? 'Sign up now' : 'Log in'}
-            </button>
-          </motion.p>
-
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
-            className="mt-8 text-center text-xs text-gray-500"
-          >
-            Lorem ipsum dolor sit amet consectetur.
-            <a href="/terms" className="underline hover:text-gray-700">Terms of Service</a> and{' '}
-            <a href="/privacy" className="underline hover:text-gray-700">Privacy Policy</a>.
-          </motion.p>
         </div>
       </div>
     </div>
-  )
+  );
 }
