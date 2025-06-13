@@ -3,7 +3,7 @@
 import { useAuthStore } from '../store/authStore';
 
 // API URL
-const API_URL = process.env.NEXT_PUBLIC_BACKEND || 'https://backend.velutara.com';
+const API_URL = process.env.NEXT_PUBLIC_BACKEND;
 // Dashboard interfaces
 export interface DashboardSummary {
   totalUsers: number;

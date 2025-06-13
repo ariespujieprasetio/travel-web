@@ -1,7 +1,7 @@
 import { useAuthStore } from '../store/authStore';
 
 // API base URL - update this to match your backend
-const API_URL = process.env.NEXT_PUBLIC_BACKEND || 'http://localhost:5600';
+const API_URL = process.env.NEXT_PUBLIC_BACKEND;
 
 
 interface RequestOptions extends RequestInit {
