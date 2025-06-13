@@ -1,13 +1,17 @@
+//login/page.tsx 
+
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
 import React from 'react'
-import { motion, AnimatePresence, useAnimation } from 'framer-motion'
+import { motion, AnimatePresence, useAnimation  } from 'framer-motion'
 import GradientButton from '@/src/components/GradientButton'
 import LogoIcon from '@/src/LogoIcon'
 import useAuth from '@/src/hooks/useAuth'
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/src/store/authStore"
+
 
 const testimonials = [
   {
@@ -48,172 +52,160 @@ const testimonials = [
 ];
 
 export default function LoginPage() {
-  const [isLogin, setIsLogin] = useState(true);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
-  const [rememberMe, setRememberMe] = useState(false);
-  const [passwordVisible, setPasswordVisible] = useState(false);
+  // Auth state
+  const [isLogin, setIsLogin] = useState(true)
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [name, setName] = useState('')
+  const [rememberMe, setRememberMe] = useState(false)
+  const [passwordVisible, setPasswordVisible] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(false) // New state for auth check
+const [mounted, setMounted] = useState(false);
 
-  const { login, signup, isLoading, error, clearError } = useAuth({
-    redirectIfAuthenticated: '/dashboard' // Redirect to dashboard if already logged in
-  });
+  const [gapi, setGapi] = useState<any>(null);
 
   const router = useRouter();
 
-  // Check URL for signup parameter
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.get('signup') === 'true') {
-        setIsLogin(false);
-      }
-    }
-  }, []);
+    const { token, user, isLoading, error, clearError, login, signup, loginRegisterWithGoogle } = useAuthStore();
 
-  // Clear errors when switching between login/signup
+  useEffect(() => setMounted(true), []);
+
   useEffect(() => {
     clearError();
-  }, [isLogin, clearError]);
+  }, [mounted, clearError]);
 
-  // Check token in localStorage when the page is loaded
   useEffect(() => {
-    const token = localStorage.getItem("authToken");
-    if (token) {
-      // If token is found, redirect to the dashboard
-      router.push("/dashboard");
+    if (mounted && token && user) {
+      router.push('/dashboard');
     }
-  }, [router]);
+  }, [mounted, token, user, router]);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const googleBtnRef = useRef<HTMLDivElement>(null);
 
-    if (isLogin) {
-      const success = await login(email, password, rememberMe);
-      if (success) {
-        window.location.replace('/dashboard');
-      }
-    } else {
-      const success = await signup(email, password, rememberMe, name);
-      if (success) {
-        window.location.replace('/dashboard');
-      }
-    }
-  };
+const renderGoogleButton = () => {
+  if (typeof window === 'undefined') return;
+  if (!window.google || !googleBtnRef.current) return;
 
-  const togglePasswordVisibility = (): void => {
-    setPasswordVisible(!passwordVisible);
-  };
+  googleBtnRef.current.innerHTML = '';
 
-  // Store token in localStorage after Google login
-  // useEffect(() => {
-  //   const urlParams = new URLSearchParams(window.location.search);
-  //   const token = urlParams.get("token");
-  //   if (token) {
-  //     localStorage.setItem("authToken", token); // Save the token to localStorage
-  //     router.push("/dashboard"); // Redirect to the dashboard
-  //   }
-  // }, [router]);
+  window.google.accounts.id.initialize({
+    client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,
+    callback: async (res) => {
+      console.log("Google Credential: ", res.credential);
+      const ok = await loginRegisterWithGoogle(res.credential);
+      if (ok) router.push('/dashboard');
+    },
+  });
 
-declare global {
-  interface Window {
-    gapi: any;
-  }
-}
-
-const handleGoogleLogin = async () => {
-  try {
-    // Make sure `gapi.auth2` is available
-    const GoogleAuth = window.gapi.auth2.getAuthInstance();
-    const googleUser = await GoogleAuth.signIn();
-    const token = googleUser.getAuthResponse().id_token;
-
-    console.log('Google token:', token);
-
-    // Send the token to your backend for login or registration
-    window.location.href = `http://localhost:3000/auth/google/callback?token=${token}&action=${isLogin ? 'login' : 'register'}`;
-  } catch (error) {
-    console.error('Google login error:', error);
-  }
+  window.google.accounts.id.renderButton(googleBtnRef.current, {
+    theme: 'outline',
+    size: 'large',
+    locale: "en",
+    width: 'fill',
+    text: isLogin ? 'signin_with' : 'signup_with',
+  });
 };
 
+
+
 useEffect(() => {
-  const loadGapiScript = () => {
-    const script = document.createElement('script');
-    script.src = 'https://apis.google.com/js/platform.js';
-    script.async = true;
-    script.onload = () => {
-      window.gapi.load("auth2", () => {
-        window.gapi.auth2.init({
-          client_id: "835817856194-28jpgd4j0rc8o43rum7k7e3uftaf2177.apps.googleusercontent.com", // Replace with your Google Client ID
-        });
-      });
-    };
-    document.head.appendChild(script);
-  };
+  if (!mounted) return;
 
-  loadGapiScript();
+  const timeout = setTimeout(() => {
+    renderGoogleButton();
+  }, 100);
 
-  return () => {
-    const script = document.querySelector('script[src="https://apis.google.com/js/platform.js"]');
-    if (script) {
-      script.remove();
+  const handleVisibilityChange = () => {
+    if (document.visibilityState === 'visible') {
+      renderGoogleButton();
     }
   };
-}, []);
+
+  document.addEventListener('visibilitychange', handleVisibilityChange);
+
+  return () => {
+    clearTimeout(timeout);
+    document.removeEventListener('visibilitychange', handleVisibilityChange);
+  };
+}, [mounted, loginRegisterWithGoogle, router, isLogin]);
+
+  useEffect(() => {
+    clearError()
+  }, [isLogin, clearError]);
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+
+      if (isLogin) {
+        const success = await login(email, password, rememberMe);
+        if (success) {
+          router.push("/dashboard");
+        }
+      } else {
+        const success = await signup(email, password, rememberMe, name,);
+        if (success) {
+          router.push("/dashboard");
+        }
+      }
+    };
 
 
-  // Create slider testimonials
-  const cardWidth = 340;
-  const gap = 24;
-  const totalCardWidth = cardWidth + gap;
+  const togglePasswordVisibility = (): void => {
+    setPasswordVisible(!passwordVisible)
+  }
 
-  const [index, setIndex] = useState(0);
-  const controls = useAnimation();
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  // create slider testimonials
+  const cardWidth = 340
+  const gap = 24
+  const totalCardWidth = cardWidth + gap
+
+  const [index, setIndex] = useState(0)
+  const controls = useAnimation()
+  const intervalRef = useRef<NodeJS.Timeout | null>(null)
 
   const slideTo = (newIndex: number) => {
-    setIndex(newIndex);
-    controls.start({ x: -newIndex * totalCardWidth });
-  };
+    setIndex(newIndex)
+    controls.start({ x: -newIndex * totalCardWidth })
+  }
 
   const handlePrev = () => {
-    const newIndex = index === 0 ? testimonials.length - 1 : index - 1;
-    slideTo(newIndex);
-    resetAutoSlide();
-  };
+    const newIndex = index === 0 ? testimonials.length - 1 : index - 1
+    slideTo(newIndex)
+    resetAutoSlide()
+  }
 
   const handleNext = () => {
-    const newIndex = (index + 1) % testimonials.length;
-    slideTo(newIndex);
-    resetAutoSlide();
-  };
+    const newIndex = (index + 1) % testimonials.length
+    slideTo(newIndex)
+    resetAutoSlide()
+  }
 
   const startAutoSlide = () => {
     intervalRef.current = setInterval(() => {
-      setIndex((prev) => {
-        const nextIndex = (prev + 1) % testimonials.length;
-        controls.start({ x: -nextIndex * totalCardWidth });
-        return nextIndex;
-      });
-    }, 4000);
-  };
+      setIndex(prev => {
+        const nextIndex = (prev + 1) % testimonials.length
+        controls.start({ x: -nextIndex * totalCardWidth })
+        return nextIndex
+      })
+    }, 4000)
+  }
 
   const resetAutoSlide = () => {
     if (intervalRef.current) {
-      clearInterval(intervalRef.current);
+      clearInterval(intervalRef.current)
     }
-    startAutoSlide();
-  };
+    startAutoSlide()
+  }
 
   useEffect(() => {
-    startAutoSlide();
+    startAutoSlide()
     return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, []);
+      if (intervalRef.current) clearInterval(intervalRef.current)
+    }
+  }, [])
 
-  return (
+    return (
     <div className="flex min-h-screen overflow-hidden">
       {/* Left side with background image */}
       <div className="hidden md:flex md:w-1/2 relative bg-gradient-to-br from-purple-600 to-indigo-700 items-center justify-center">
@@ -229,28 +221,50 @@ useEffect(() => {
         </div>
 
         <div className="relative z-10 max-w-md text-white px-8">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
             <div className="mb-6 flex items-center">
               <LogoIcon width={40} height={40} color="white" />
               <h1 className="ml-3 text-3xl font-bold">VELUTARA</h1>
             </div>
             <h2 className="text-3xl font-bold mb-6">Your AI Travel Companion</h2>
             <p className="text-purple-100 text-lg mb-8">
-              Join thousands of travelers who plan better trips with personalized recommendations, custom itineraries, and expert travel advice.
+              Join thousands of travelers who plan better trips with personalized recommendations,
+              custom itineraries, and expert travel advice.
             </p>
             <div className="relative w-full overflow-hidden py-8 px-6">
               {/* Navigation buttons */}
-              <button onClick={handlePrev} className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 p-2 rounded-full z-10">
+              <button
+                onClick={handlePrev}
+                className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 p-2 rounded-full z-10"
+              >
                 <ChevronLeft className="text-white" />
               </button>
-              <button onClick={handleNext} className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 p-2 rounded-full z-10">
+              <button
+                onClick={handleNext}
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 p-2 rounded-full z-10"
+              >
                 <ChevronRight className="text-white" />
               </button>
 
               <div className="overflow-hidden w-full">
-                <motion.div animate={controls} transition={{ duration: 0.5 }} className="flex gap-6" style={{ width: `${testimonials.length * totalCardWidth}px` }}>
+                <motion.div
+                  animate={controls}
+                  transition={{ duration: 0.5 }}
+                  className="flex gap-6"
+                  style={{
+                    width: `${testimonials.length * totalCardWidth}px`,
+                  }}
+                >
                   {testimonials.map((t, i) => (
-                    <div key={i} className="min-w-[300px] max-w-[340px] bg-white/10 backdrop-blur-sm p-4 rounded-xl shadow-lg text-white flex-shrink-0" style={{ width: `${cardWidth}px` }}>
+                    <div
+                      key={i}
+                      className="min-w-[300px] max-w-[340px] bg-white/10 backdrop-blur-sm p-4 rounded-xl shadow-lg text-white flex-shrink-0"
+                      style={{ width: `${cardWidth}px` }}
+                    >
                       <div className="flex items-center mb-3">
                         <div className="w-10 h-10 rounded-full bg-purple-200 flex items-center justify-center text-purple-700 font-bold text-lg">
                           {t.initials}
@@ -258,11 +272,18 @@ useEffect(() => {
                         <div className="ml-3">
                           <p className="font-medium text-white">{t.name}</p>
                           <div className="flex">
-                            {Array(t.rating).fill(null).map((_, i) => (
-                              <svg key={i} className="w-4 h-4 text-yellow-300" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118l-2.8-2.034c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                              </svg>
-                            ))}
+                            {Array(t.rating)
+                              .fill(null)
+                              .map((_, i) => (
+                                <svg
+                                  key={i}
+                                  className="w-4 h-4 text-yellow-300"
+                                  fill="currentColor"
+                                  viewBox="0 0 20 20"
+                                >
+                                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118l-2.8-2.034c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                </svg>
+                              ))}
                           </div>
                         </div>
                       </div>
@@ -308,6 +329,7 @@ useEffect(() => {
 
           {/* Tab switching */}
           <div className="bg-gray-100 rounded-lg p-1 mb-8 flex relative">
+            {/* Animated highlight */}
             <motion.div
               className="absolute top-1 bottom-1 rounded-md bg-white shadow-sm z-0"
               initial={false}
@@ -418,6 +440,7 @@ useEffect(() => {
                       id="password"
                       name="password"
                       type={passwordVisible ? "text" : "password"}
+                      autoComplete={isLogin ? "current-password" : "new-password"}
                       value={password}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
                       required
@@ -498,37 +521,38 @@ useEffect(() => {
                     <span className="bg-white px-2 text-gray-500">or continue with</span>
                   </div>
                 </div>
-
-                <button
-                  type="button"
-                  onClick={handleGoogleLogin}
-                  className="mt-6 w-full inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm bg-white hover:bg-gray-50 transition duration-150"
-                >
-                  <svg className="h-5 w-5 mr-2" viewBox="0 0 48 48">
-                    <path
-                      fill="#EA4335"
-                      d="M24 9.5c3.1 0 5.6 1.1 7.4 2.8l5.5-5.5C33.6 3.4 29.2 1.5 24 1.5 14.6 1.5 6.8 7.9 3.6 16.3l6.8 5.3C12.5 14.4 17.7 9.5 24 9.5z"
-                    />
-                    <path
-                      fill="#34A853"
-                      d="M46.1 24.5c0-1.6-.1-2.7-.4-4H24v7.5h12.5c-.6 3-2.4 5.5-5.1 7.2v5.9h8.2c4.8-4.4 6.9-10.9 6.9-16.6z"
-                    />
-                    <path
-                      fill="#4A90E2"
-                      d="M10.4 28.6C9.7 26.8 9.3 24.9 9.3 23s.4-3.8 1.1-5.6l-6.8-5.3C1.9 15.4 0 19.5 0 24s1.9 8.6 5.1 11.9l6.8-5.3z"
-                    />
-                    <path
-                      fill="#FBBC05"
-                      d="M24 46.5c5.2 0 9.6-1.7 12.8-4.7l-8.2-5.9c-1.5 1-3.5 1.6-5.8 1.6-6.3 0-11.5-4.9-12.5-11.2l-6.8 5.3C6.8 40.1 14.6 46.5 24 46.5z"
-                    />
-                  </svg>
-                  <span>{isLogin ? 'Sign in with Google' : 'Sign up with Google'}</span>
-                </button>
+                <div ref={googleBtnRef} className="mt-6 full justify-center" />
               </form>
             </motion.div>
           </AnimatePresence>
+
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+            className="mt-6 text-center text-sm text-gray-600"
+          >
+            {isLogin ? "Don't have an account? " : "Already have an account? "}
+            <button
+              onClick={() => setIsLogin(!isLogin)}
+              className="font-medium text-purple-600 hover:text-purple-700"
+            >
+              {isLogin ? 'Sign up now' : 'Log in'}
+            </button>
+          </motion.p>
+
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
+            className="mt-8 text-center text-xs text-gray-500"
+          >
+            Lorem ipsum dolor sit amet consectetur.
+            <a href="/terms" className="underline hover:text-gray-700">Terms of Service</a> and{' '}
+            <a href="/privacy" className="underline hover:text-gray-700">Privacy Policy</a>.
+          </motion.p>
         </div>
       </div>
     </div>
-  );
+  )
 }

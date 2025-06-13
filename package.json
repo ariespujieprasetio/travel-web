@@ -10,11 +10,13 @@
   },
   "dependencies": {
     "@headlessui/react": "^2.2.0",
+    "@react-oauth/google": "^0.12.2",
     "axios": "^1.8.1",
     "classnames": "^2.5.1",
     "clsx": "^2.1.1",
     "file-saver": "^2.0.5",
     "framer-motion": "^12.4.7",
+    "gapi-script": "^1.2.0",
     "jspdf": "^2.5.1",
     "jspdf-autotable": "^3.5.31",
     "lucide-react": "^0.511.0",
