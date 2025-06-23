@@ -49,6 +49,41 @@ const testimonials = [
     review:
       "I love the simple interface and the weather forecast is very accurate. My trip to Bali went so smoothly thanks to Velutara!",
   },
+  {
+    initials: "TS",
+    name: "Tommy Sanders",
+    rating: 4,
+    review:
+      "Velutara helped me plan my Europe backpacking trip faster than any other tool I’ve tried. Some suggestions could be more budget-focused, but overall great!",
+  },
+  {
+    initials: "LS",
+    name: "Lena Schmidt",
+    rating: 5,
+    review:
+      "A lifesaver! I had less than a week to plan a trip to Seoul, and Velutara gave me a full itinerary, including transit maps and food recs.",
+  },
+  {
+    initials: "BR",
+    name: "Brian Richards",
+    rating: 4,
+    review:
+      "Very convenient! Though I wish it had more offline features, Velutara still helped me enjoy every bit of my Thailand trip.",
+  },
+  {
+    initials: "NL",
+    name: "Nadia Lopez",
+    rating: 5,
+    review:
+      "From booking to arrival, Velutara had everything covered. Even local phrases were suggested to help me get around!",
+  },
+  {
+    initials: "HS",
+    name: "Haruto Sato",
+    rating: 5,
+    review:
+      "Perfect for travelers like me who prefer to avoid tourist traps. I found peaceful temples and authentic eateries thanks to Velutara.",
+  },
 ];
 
 export default function LoginPage() {

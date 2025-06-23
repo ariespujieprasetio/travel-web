@@ -214,10 +214,10 @@ export default function LandingPage() {
       {/* Trusted By Section */}
       <section className="py-12 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-8">
+          <div className="text-center mb-2">
             <p className="text-base font-medium text-purple-600">TRUSTED BY TRAVELERS WORLDWIDE</p>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-8 items-center justify-items-center opacity-70">
+          {/* <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-8 items-center justify-items-center opacity-70">
             <div className="h-8">
               <svg className="h-full" viewBox="0 0 100 30" fill="currentColor">
                 <path d="M5.9,11.6H2.5v9h3.4c2.9,0,4.5-1.8,4.5-4.5C10.5,13.4,8.8,11.6,5.9,11.6z M5.8,18.5H5.2v-4.9h0.7c1.4,0,2.2,0.9,2.2,2.4C8.1,17.6,7.2,18.5,5.8,18.5z M11.2,20.6h2.7v-3.5h2.5v-1.9h-2.5v-1.6h3.1v-1.9h-5.8V20.6z M18.8,20.6h2.7v-3h0.3l2,3h3l-2.4-3.5c1.2-0.4,1.8-1.4,1.8-2.7c0-2-1.3-3.2-3.5-3.2h-4V20.6z M21.5,15.7v-2.1h0.8c0.9,0,1.3,0.4,1.3,1.1c0,0.7-0.4,1-1.3,1H21.5z M27.9,20.6h2.7v-9h-2.7V20.6z M33.8,13.6h2.5v7h2.7v-7h2.5v-1.9h-7.7V13.6z M43.2,20.6h2.7v-9h-2.7V20.6z M54.5,18.3h-3.6l0.6-1.7l0.6-1.9l0.6,1.9L54.5,18.3z M55.7,20.6h2.9l-3.6-9h-3.2l-3.6,9h2.9l0.5-1.3h3.7L55.7,20.6z M65.9,20.6h2.7v-3.5h2.5v-1.9h-2.5v-1.6h3.1v-1.9h-5.8V20.6z M76.8,15.7v-2.1h0.8c0.9,0,1.3,0.4,1.3,1.1c0,0.7-0.4,1-1.3,1H76.8z M74.1,20.6h2.7v-3h0.3l2,3h3l-2.4-3.5c1.2-0.4,1.8-1.4,1.8-2.7c0-2-1.3-3.2-3.5-3.2h-4V20.6z M86.8,20.6h5.9v-1.9h-3.2v-7h-2.7V20.6z M95.9,11.6c-2.7,0-4.7,2-4.7,4.5c0,2.6,2,4.6,4.7,4.6c2.7,0,4.7-2,4.7-4.6C100.6,13.6,98.6,11.6,95.9,11.6z M95.9,18.6c-1.3,0-2-1-2-2.4c0-1.4,0.7-2.4,2-2.4c1.3,0,2,1,2,2.4C97.9,17.6,97.2,18.6,95.9,18.6z" />
@@ -248,7 +248,7 @@ export default function LandingPage() {
                 <path d="M42.6,6.1H37L27.7,23.8h6.1l1.3-2.6h7.7l1.3,2.6h6.1L42.6,6.1z M37.4,16.7l2-4l2,4H37.4z M68.1,23.8h-5.5v-1c-1.2,1-2.9,1.5-4.9,1.5c-3.8,0-6.1-2.2-6.1-5.5c0-2.8,1.8-5.1,6.3-5.1h4.4v-0.5c0-1.5-1.2-2.3-3.4-2.3c-1.8,0-3.9,0.6-6,1.7V8.3c2.4-1,4.9-1.5,7.5-1.5c5.5,0,8.2,2.2,8.2,6.8v10.2H68.1z M62.4,19.2v-1.8h-2.9c-1.7,0-2.3,0.6-2.3,1.7c0,1,0.8,1.7,2.1,1.7C60.6,20.8,61.7,20.2,62.4,19.2z M16.1,23.8h-5.5v-1c-1.2,1-3,1.5-5,1.5c-3.8,0-6.1-2.2-6.1-5.5c0-2.8,1.8-5.1,6.3-5.1h4.4v-0.5c0-1.5-1.2-2.3-3.4-2.3c-1.8,0-3.9,0.6-6,1.7V8.3c2.4-1,4.9-1.5,7.5-1.5c5.5,0,8.2,2.2,8.2,6.8v10.2H16.1z M10.4,19.2v-1.8H7.5c-1.7,0-2.3,0.6-2.3,1.7c0,1,0.8,1.7,2.1,1.7C8.6,20.8,9.7,20.2,10.4,19.2z M93.4,14.8h-9.8c0.5-2.1,2.2-3.1,4.4-3.1c2.5,0,4.4,1.1,5.3,3.1H93.4z M100,16.5h-5.7c-0.4,2.5-2.6,4.1-5.5,4.1c-3.4,0-5.9-2.3-5.9-5.9c0-3.5,2.4-6,5.7-6c3.5,0,5.9,2.3,5.9,5.8v1.1h-6.1c0.7,1.3,2,2,3.8,2c1.2,0,2.1-0.3,2.8-1C95.7,16,99.9,16.2,100,16.5z M24.5,13.8c0-4.2-3.2-7.1-7.7-7.1h-8.5v17h3.7v-5.2h4.9c4.4,0,7.7-2.7,7.7-7C24.5,14.4,24.5,13.8,24.5,13.8z M12,11.5h3.8c2.1,0,3.6,1.1,3.6,2.8c0,1.7-1.4,2.8-3.6,2.8H12V11.5z M81,23.9h-5.3V6.8H81V23.9z" />
               </svg>
             </div>
-          </div>
+          </div> */}
         </div>
       </section>
 
@@ -289,30 +289,21 @@ export default function LandingPage() {
           <div className="text-center mb-12">
             <h2 className="text-3xl sm:text-4xl font-bold mb-4">Explore Popular Destinations</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Tempora, molestiae.
+              Discover top cities for business travel — from global financial hubs to well-connected urban centers built for productivity.
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {/* Paris */}
+            {/* Dubai */}
             <div className="group rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow relative bg-white border border-gray-100">
-              <div className="h-48 bg-indigo-50 flex items-center justify-center">
-                <svg width="150" height="120" viewBox="0 0 150 120" className="text-indigo-900">
-                  {/* Eiffel Tower Illustration */}
-                  <path d="M75,10 L80,25 L83,40 L87,55 L90,70 L95,85 L75,85 L55,85 L60,70 L63,55 L67,40 L70,25 Z" fill="none" stroke="currentColor" strokeWidth="2" />
-                  <path d="M55,85 L50,100 L100,100 L95,85" fill="none" stroke="currentColor" strokeWidth="2" />
-                  <rect x="65" y="85" width="20" height="15" fill="none" stroke="currentColor" strokeWidth="2" />
-                  <line x1="75" y1="10" x2="75" y2="5" stroke="currentColor" strokeWidth="2" />
-                  <line x1="70" y1="40" x2="80" y2="40" stroke="currentColor" strokeWidth="2" />
-                  <line x1="67" y1="55" x2="83" y2="55" stroke="currentColor" strokeWidth="2" />
-                  <line x1="63" y1="70" x2="87" y2="70" stroke="currentColor" strokeWidth="2" />
-                  <path d="M50,100 L45,110 L105,110 L100,100" fill="none" stroke="currentColor" strokeWidth="2" />
-                  <line x1="60" y1="110" x2="90" y2="110" stroke="currentColor" strokeWidth="2" />
+              <div className="h-48 bg-yellow-50 flex items-center justify-center">
+                <svg width="150" height="120" viewBox="0 0 150 120" className="text-yellow-600">
+                  <path d="M75,10 L78,30 L75,40 L78,50 L75,60 L78,70 L75,80 L75,110" stroke="currentColor" strokeWidth="2" fill="none"/>
+                  <rect x="70" y="110" width="10" height="10" stroke="currentColor" fill="none" strokeWidth="2"/>
                 </svg>
               </div>
               <div className="p-4">
-                <h3 className="text-xl font-bold mb-1 group-hover:text-purple-700 transition-colors">Paris, France</h3>
-                <p className="text-gray-600 text-sm">The City of Light with iconic landmarks and romantic vibes.</p>
+                <h3 className="text-xl font-bold mb-1 group-hover:text-purple-700 transition-colors">Dubai, UAE</h3>
               </div>
             </div>
 
@@ -320,7 +311,6 @@ export default function LandingPage() {
             <div className="group rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow relative bg-white border border-gray-100">
               <div className="h-48 bg-red-50 flex items-center justify-center">
                 <svg width="150" height="120" viewBox="0 0 150 120" className="text-red-800">
-                  {/* Tokyo Tower and Mt. Fuji Illustration */}
                   <path d="M30,100 C40,70 60,55 75,50 C90,55 110,70 120,100" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                   <path d="M65,75 L75,30 L85,75" fill="none" stroke="currentColor" strokeWidth="2" />
                   <line x1="68" y1="65" x2="82" y2="65" stroke="currentColor" strokeWidth="2" />
@@ -335,30 +325,21 @@ export default function LandingPage() {
               </div>
               <div className="p-4">
                 <h3 className="text-xl font-bold mb-1 group-hover:text-purple-700 transition-colors">Tokyo, Japan</h3>
-                <p className="text-gray-600 text-sm">A blend of traditional and ultra-modern culture.</p>
               </div>
             </div>
 
-            {/* Santorini */}
+            {/* Shanghai */}
             <div className="group rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow relative bg-white border border-gray-100">
-              <div className="h-48 bg-blue-50 flex items-center justify-center">
-                <svg width="150" height="120" viewBox="0 0 150 120" className="text-blue-900">
-                  {/* Santorini White Buildings Illustration */}
-                  <rect x="25" y="60" width="30" height="40" fill="white" stroke="currentColor" strokeWidth="2" />
-                  <rect x="55" y="50" width="40" height="50" fill="white" stroke="currentColor" strokeWidth="2" />
-                  <rect x="95" y="40" width="30" height="60" fill="white" stroke="currentColor" strokeWidth="2" />
-                  <path d="M25,60 C25,60 35,40 45,40 C55,40 55,60 55,60" fill="none" stroke="currentColor" strokeWidth="2" />
-                  <path d="M55,50 C55,50 75,30 95,40" fill="none" stroke="currentColor" strokeWidth="2" />
-                  <circle cx="40" cy="50" r="5" fill="rgb(59, 130, 246)" stroke="currentColor" />
-                  <circle cx="70" cy="40" r="5" fill="rgb(59, 130, 246)" stroke="currentColor" />
-                  <circle cx="110" cy="30" r="5" fill="rgb(59, 130, 246)" stroke="currentColor" />
-                  <path d="M20,100 L130,100" stroke="currentColor" strokeWidth="2" />
-                  <path d="M20,100 C20,100 50,90 75,95 C100,100 130,100 130,100" fill="none" stroke="rgb(59, 130, 246)" strokeWidth="2" />
+              <div className="h-48 bg-pink-50 flex items-center justify-center">
+                <svg width="150" height="120" viewBox="0 0 150 120" className="text-pink-700">
+                  <circle cx="75" cy="60" r="10" stroke="currentColor" fill="none" strokeWidth="2"/>
+                  <line x1="75" y1="10" x2="75" y2="110" stroke="currentColor" strokeWidth="2"/>
+                  <line x1="70" y1="30" x2="80" y2="30" stroke="currentColor" strokeWidth="2"/>
+                  <line x1="70" y1="90" x2="80" y2="90" stroke="currentColor" strokeWidth="2"/>
                 </svg>
               </div>
               <div className="p-4">
-                <h3 className="text-xl font-bold mb-1 group-hover:text-purple-700 transition-colors">Santorini, Greece</h3>
-                <p className="text-gray-600 text-sm">Stunning sunsets and picturesque white and blue buildings.</p>
+                <h3 className="text-xl font-bold mb-1 group-hover:text-purple-700 transition-colors">Shanghai, China</h3>
               </div>
             </div>
 
@@ -366,7 +347,6 @@ export default function LandingPage() {
             <div className="group rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow relative bg-white border border-gray-100">
               <div className="h-48 bg-gray-50 flex items-center justify-center">
                 <svg width="150" height="120" viewBox="0 0 150 120" className="text-gray-800">
-                  {/* New York Skyline Illustration */}
                   <rect x="20" y="50" width="15" height="50" fill="none" stroke="currentColor" strokeWidth="2" />
                   <rect x="35" y="60" width="10" height="40" fill="none" stroke="currentColor" strokeWidth="2" />
                   <rect x="45" y="40" width="15" height="60" fill="none" stroke="currentColor" strokeWidth="2" />
@@ -382,7 +362,63 @@ export default function LandingPage() {
               </div>
               <div className="p-4">
                 <h3 className="text-xl font-bold mb-1 group-hover:text-purple-700 transition-colors">New York City, USA</h3>
-                <p className="text-gray-600 text-sm">The Big Apple with its iconic skyline and vibrant energy.</p>
+              </div>
+            </div>
+
+            {/* Singapore */}
+            <div className="group rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow relative bg-white border border-gray-100">
+              <div className="h-48 bg-green-50 flex items-center justify-center">
+                <svg width="150" height="120" viewBox="0 0 150 120" className="text-green-700">
+                  <rect x="50" y="60" width="15" height="40" stroke="currentColor" fill="none" strokeWidth="2"/>
+                  <rect x="70" y="60" width="15" height="40" stroke="currentColor" fill="none" strokeWidth="2"/>
+                  <rect x="90" y="60" width="15" height="40" stroke="currentColor" fill="none" strokeWidth="2"/>
+                  <rect x="50" y="50" width="55" height="5" stroke="currentColor" fill="none" strokeWidth="2"/>
+                </svg>
+              </div>
+              <div className="p-4">
+                <h3 className="text-xl font-bold mb-1 group-hover:text-purple-700 transition-colors">Singapore</h3>
+              </div>
+            </div>
+
+            {/* London */}
+            <div className="group rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow relative bg-white border border-gray-100">
+              <div className="h-48 bg-indigo-100 flex items-center justify-center">
+                <svg width="150" height="120" viewBox="0 0 150 120" className="text-indigo-800">
+                  <rect x="70" y="50" width="10" height="50" stroke="currentColor" fill="none" strokeWidth="2"/>
+                  <polygon points="75,30 65,50 85,50" stroke="currentColor" fill="none" strokeWidth="2"/>
+                  <circle cx="75" cy="65" r="5" stroke="currentColor" fill="none" strokeWidth="2"/>
+                </svg>
+              </div>
+              <div className="p-4">
+                <h3 className="text-xl font-bold mb-1 group-hover:text-purple-700 transition-colors">London, UK</h3>
+              </div>
+            </div>
+
+            {/* Seoul */}
+            <div className="group rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow relative bg-white border border-gray-100">
+              <div className="h-48 bg-purple-50 flex items-center justify-center">
+                <svg width="150" height="120" viewBox="0 0 150 120" className="text-purple-700">
+                  <line x1="75" y1="10" x2="75" y2="100" stroke="currentColor" strokeWidth="2"/>
+                  <circle cx="75" cy="40" r="8" stroke="currentColor" fill="none" strokeWidth="2"/>
+                  <rect x="65" y="100" width="20" height="10" stroke="currentColor" fill="none" strokeWidth="2"/>
+                </svg>
+              </div>
+              <div className="p-4">
+                <h3 className="text-xl font-bold mb-1 group-hover:text-purple-700 transition-colors">Seoul, South Korea</h3>
+              </div>
+            </div>
+
+            {/* Jakarta */}
+            <div className="group rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow relative bg-white border border-gray-100">
+              <div className="h-48 bg-orange-50 flex items-center justify-center">
+                <svg width="150" height="120" viewBox="0 0 150 120" className="text-orange-600">
+                  <rect x="70" y="50" width="10" height="50" stroke="currentColor" fill="none" strokeWidth="2"/>
+                  <polygon points="75,30 65,50 85,50" stroke="currentColor" fill="none" strokeWidth="2"/>
+                  <circle cx="75" cy="25" r="5" fill="currentColor" />
+                </svg>
+              </div>
+              <div className="p-4">
+                <h3 className="text-xl font-bold mb-1 group-hover:text-purple-700 transition-colors">Jakarta, Indonesia</h3>
               </div>
             </div>
           </div>

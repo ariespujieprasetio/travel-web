@@ -7,6 +7,9 @@ import { roboto_mono } from "./fonts";
 export const metadata: Metadata = {
   title: "VELUTARA",
   description: "",
+  icons: {
+    icon: "/icon.svg",
+  },
 };
 
 export default function RootLayout({
