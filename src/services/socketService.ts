@@ -4,7 +4,7 @@ import { io, Socket } from "socket.io-client";
 import { useAuthStore } from "@/src/store/authStore";
 
 // API and WebSocket configuration
-const API_URL = process.env.NEXT_PUBLIC_BACKEND;
+const API_URL = process.env.NEXT_PUBLIC_BACKEND || 'https://backend.velutara.com';
 
 // Socket singleton to avoid multiple connections
 let socket: Socket | null = null;
