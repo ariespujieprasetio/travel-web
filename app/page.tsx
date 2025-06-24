@@ -294,134 +294,87 @@ export default function LandingPage() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {/* Dubai */}
-            <div className="group rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow relative bg-white border border-gray-100">
-              <div className="h-48 bg-yellow-50 flex items-center justify-center">
-                <svg width="150" height="120" viewBox="0 0 150 120" className="text-yellow-600">
-                  <path d="M75,10 L78,30 L75,40 L78,50 L75,60 L78,70 L75,80 L75,110" stroke="currentColor" strokeWidth="2" fill="none"/>
-                  <rect x="70" y="110" width="10" height="10" stroke="currentColor" fill="none" strokeWidth="2"/>
-                </svg>
-              </div>
-              <div className="p-4">
-                <h3 className="text-xl font-bold mb-1 group-hover:text-purple-700 transition-colors">Dubai, UAE</h3>
-              </div>
-            </div>
+  {/* Dubai */}
+  <div className="group rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow relative bg-white border border-gray-100">
+    <div className="h-48 bg-yellow-50 flex items-center justify-center">
+      <img src="/icons/dubai.png" alt="Dubai" className="w-24 h-24 object-contain group-hover:scale-110 transition-transform" />
+    </div>
+    <div className="p-4">
+      <h3 className="text-xl font-bold mb-1 group-hover:text-purple-700 transition-colors">Dubai, UAE</h3>
+    </div>
+  </div>
 
-            {/* Tokyo */}
-            <div className="group rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow relative bg-white border border-gray-100">
-              <div className="h-48 bg-red-50 flex items-center justify-center">
-                <svg width="150" height="120" viewBox="0 0 150 120" className="text-red-800">
-                  <path d="M30,100 C40,70 60,55 75,50 C90,55 110,70 120,100" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                  <path d="M65,75 L75,30 L85,75" fill="none" stroke="currentColor" strokeWidth="2" />
-                  <line x1="68" y1="65" x2="82" y2="65" stroke="currentColor" strokeWidth="2" />
-                  <line x1="70" y1="55" x2="80" y2="55" stroke="currentColor" strokeWidth="2" />
-                  <line x1="72" y1="45" x2="78" y2="45" stroke="currentColor" strokeWidth="2" />
-                  <path d="M65,75 L65,100" fill="none" stroke="currentColor" strokeWidth="2" />
-                  <path d="M85,75 L85,100" fill="none" stroke="currentColor" strokeWidth="2" />
-                  <rect x="95" y="70" width="15" height="30" fill="none" stroke="currentColor" strokeWidth="2" />
-                  <rect x="40" y="80" width="15" height="20" fill="none" stroke="currentColor" strokeWidth="2" />
-                  <rect x="45" y="65" width="10" height="15" fill="none" stroke="currentColor" strokeWidth="2" />
-                </svg>
-              </div>
-              <div className="p-4">
-                <h3 className="text-xl font-bold mb-1 group-hover:text-purple-700 transition-colors">Tokyo, Japan</h3>
-              </div>
-            </div>
+  {/* Tokyo */}
+  <div className="group rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow relative bg-white border border-gray-100">
+    <div className="h-48 bg-red-50 flex items-center justify-center">
+      <img src="/icons/tokyo.png" alt="Tokyo" className="w-24 h-24 object-contain group-hover:scale-110 transition-transform" />
+    </div>
+    <div className="p-4">
+      <h3 className="text-xl font-bold mb-1 group-hover:text-purple-700 transition-colors">Tokyo, Japan</h3>
+    </div>
+  </div>
 
-            {/* Shanghai */}
-            <div className="group rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow relative bg-white border border-gray-100">
-              <div className="h-48 bg-pink-50 flex items-center justify-center">
-                <svg width="150" height="120" viewBox="0 0 150 120" className="text-pink-700">
-                  <circle cx="75" cy="60" r="10" stroke="currentColor" fill="none" strokeWidth="2"/>
-                  <line x1="75" y1="10" x2="75" y2="110" stroke="currentColor" strokeWidth="2"/>
-                  <line x1="70" y1="30" x2="80" y2="30" stroke="currentColor" strokeWidth="2"/>
-                  <line x1="70" y1="90" x2="80" y2="90" stroke="currentColor" strokeWidth="2"/>
-                </svg>
-              </div>
-              <div className="p-4">
-                <h3 className="text-xl font-bold mb-1 group-hover:text-purple-700 transition-colors">Shanghai, China</h3>
-              </div>
-            </div>
+  {/* Shanghai */}
+  <div className="group rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow relative bg-white border border-gray-100">
+    <div className="h-48 bg-pink-50 flex items-center justify-center">
+      <img src="/icons/shanghai.png" alt="Shanghai" className="w-24 h-24 object-contain group-hover:scale-110 transition-transform" />
+    </div>
+    <div className="p-4">
+      <h3 className="text-xl font-bold mb-1 group-hover:text-purple-700 transition-colors">Shanghai, China</h3>
+    </div>
+  </div>
 
-            {/* New York */}
-            <div className="group rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow relative bg-white border border-gray-100">
-              <div className="h-48 bg-gray-50 flex items-center justify-center">
-                <svg width="150" height="120" viewBox="0 0 150 120" className="text-gray-800">
-                  <rect x="20" y="50" width="15" height="50" fill="none" stroke="currentColor" strokeWidth="2" />
-                  <rect x="35" y="60" width="10" height="40" fill="none" stroke="currentColor" strokeWidth="2" />
-                  <rect x="45" y="40" width="15" height="60" fill="none" stroke="currentColor" strokeWidth="2" />
-                  <rect x="60" y="65" width="10" height="35" fill="none" stroke="currentColor" strokeWidth="2" />
-                  <rect x="70" y="20" width="15" height="80" fill="none" stroke="currentColor" strokeWidth="2" />
-                  <path d="M70,30 L85,20 L85,30" fill="none" stroke="currentColor" strokeWidth="2" />
-                  <rect x="85" y="45" width="10" height="55" fill="none" stroke="currentColor" strokeWidth="2" />
-                  <rect x="95" y="30" width="15" height="70" fill="none" stroke="currentColor" strokeWidth="2" />
-                  <rect x="110" y="55" width="10" height="45" fill="none" stroke="currentColor" strokeWidth="2" />
-                  <rect x="120" y="40" width="15" height="60" fill="none" stroke="currentColor" strokeWidth="2" />
-                  <line x1="20" y1="100" x2="135" y2="100" stroke="currentColor" strokeWidth="2" />
-                </svg>
-              </div>
-              <div className="p-4">
-                <h3 className="text-xl font-bold mb-1 group-hover:text-purple-700 transition-colors">New York City, USA</h3>
-              </div>
-            </div>
+  {/* New York */}
+  <div className="group rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow relative bg-white border border-gray-100">
+    <div className="h-48 bg-gray-50 flex items-center justify-center">
+      <img src="/icons/newyork.png" alt="New York" className="w-24 h-24 object-contain group-hover:scale-110 transition-transform" />
+    </div>
+    <div className="p-4">
+      <h3 className="text-xl font-bold mb-1 group-hover:text-purple-700 transition-colors">New York City, USA</h3>
+    </div>
+  </div>
 
-            {/* Singapore */}
-            <div className="group rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow relative bg-white border border-gray-100">
-              <div className="h-48 bg-green-50 flex items-center justify-center">
-                <svg width="150" height="120" viewBox="0 0 150 120" className="text-green-700">
-                  <rect x="50" y="60" width="15" height="40" stroke="currentColor" fill="none" strokeWidth="2"/>
-                  <rect x="70" y="60" width="15" height="40" stroke="currentColor" fill="none" strokeWidth="2"/>
-                  <rect x="90" y="60" width="15" height="40" stroke="currentColor" fill="none" strokeWidth="2"/>
-                  <rect x="50" y="50" width="55" height="5" stroke="currentColor" fill="none" strokeWidth="2"/>
-                </svg>
-              </div>
-              <div className="p-4">
-                <h3 className="text-xl font-bold mb-1 group-hover:text-purple-700 transition-colors">Singapore</h3>
-              </div>
-            </div>
+  {/* Singapore */}
+  <div className="group rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow relative bg-white border border-gray-100">
+    <div className="h-48 bg-green-50 flex items-center justify-center">
+      <img src="/icons/singapore.png" alt="Singapore" className="w-24 h-24 object-contain group-hover:scale-110 transition-transform" />
+    </div>
+    <div className="p-4">
+      <h3 className="text-xl font-bold mb-1 group-hover:text-purple-700 transition-colors">Singapore</h3>
+    </div>
+  </div>
 
-            {/* London */}
-            <div className="group rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow relative bg-white border border-gray-100">
-              <div className="h-48 bg-indigo-100 flex items-center justify-center">
-                <svg width="150" height="120" viewBox="0 0 150 120" className="text-indigo-800">
-                  <rect x="70" y="50" width="10" height="50" stroke="currentColor" fill="none" strokeWidth="2"/>
-                  <polygon points="75,30 65,50 85,50" stroke="currentColor" fill="none" strokeWidth="2"/>
-                  <circle cx="75" cy="65" r="5" stroke="currentColor" fill="none" strokeWidth="2"/>
-                </svg>
-              </div>
-              <div className="p-4">
-                <h3 className="text-xl font-bold mb-1 group-hover:text-purple-700 transition-colors">London, UK</h3>
-              </div>
-            </div>
+  {/* London */}
+  <div className="group rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow relative bg-white border border-gray-100">
+    <div className="h-48 bg-indigo-100 flex items-center justify-center">
+      <img src="/icons/london.png" alt="London" className="w-24 h-24 object-contain group-hover:scale-110 transition-transform" />
+    </div>
+    <div className="p-4">
+      <h3 className="text-xl font-bold mb-1 group-hover:text-purple-700 transition-colors">London, UK</h3>
+    </div>
+  </div>
 
-            {/* Seoul */}
-            <div className="group rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow relative bg-white border border-gray-100">
-              <div className="h-48 bg-purple-50 flex items-center justify-center">
-                <svg width="150" height="120" viewBox="0 0 150 120" className="text-purple-700">
-                  <line x1="75" y1="10" x2="75" y2="100" stroke="currentColor" strokeWidth="2"/>
-                  <circle cx="75" cy="40" r="8" stroke="currentColor" fill="none" strokeWidth="2"/>
-                  <rect x="65" y="100" width="20" height="10" stroke="currentColor" fill="none" strokeWidth="2"/>
-                </svg>
-              </div>
-              <div className="p-4">
-                <h3 className="text-xl font-bold mb-1 group-hover:text-purple-700 transition-colors">Seoul, South Korea</h3>
-              </div>
-            </div>
+  {/* Seoul */}
+  <div className="group rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow relative bg-white border border-gray-100">
+    <div className="h-48 bg-purple-50 flex items-center justify-center">
+      <img src="/icons/seoul.png" alt="Seoul" className="w-24 h-24 object-contain group-hover:scale-110 transition-transform" />
+    </div>
+    <div className="p-4">
+      <h3 className="text-xl font-bold mb-1 group-hover:text-purple-700 transition-colors">Seoul, South Korea</h3>
+    </div>
+  </div>
 
-            {/* Jakarta */}
-            <div className="group rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow relative bg-white border border-gray-100">
-              <div className="h-48 bg-orange-50 flex items-center justify-center">
-                <svg width="150" height="120" viewBox="0 0 150 120" className="text-orange-600">
-                  <rect x="70" y="50" width="10" height="50" stroke="currentColor" fill="none" strokeWidth="2"/>
-                  <polygon points="75,30 65,50 85,50" stroke="currentColor" fill="none" strokeWidth="2"/>
-                  <circle cx="75" cy="25" r="5" fill="currentColor" />
-                </svg>
-              </div>
-              <div className="p-4">
-                <h3 className="text-xl font-bold mb-1 group-hover:text-purple-700 transition-colors">Jakarta, Indonesia</h3>
-              </div>
-            </div>
-          </div>
+  {/* Jakarta */}
+  <div className="group rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow relative bg-white border border-gray-100">
+    <div className="h-48 bg-orange-50 flex items-center justify-center">
+      <img src="/icons/jakarta.png" alt="Jakarta" className="w-24 h-24 object-contain group-hover:scale-110 transition-transform" />
+    </div>
+    <div className="p-4">
+      <h3 className="text-xl font-bold mb-1 group-hover:text-purple-700 transition-colors">Jakarta, Indonesia</h3>
+    </div>
+  </div>
+</div>
+
 
           <div className="mt-10 text-center">
             <button
