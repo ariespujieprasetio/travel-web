@@ -11,32 +11,32 @@ import { sessionManager } from '../services/sessionService'
 
 interface ChatMessageProps {
   message: {
-    sender: 'user' | 'bot'
-    text: string
+    role: 'user' | 'assistant' | 'tool'
+    content: string
   }
 }
 
 export default function ChatMessage({ message }: ChatMessageProps) {
-  const hasTable = containsMarkdownTable(message.text)
+  const sender = message.role === 'user' ? 'user' : 'bot'
+  const text = message.content
+
+  const hasTable = containsMarkdownTable(text)
   const [showExportTools, setShowExportTools] = useState(false)
   const messageRef = useRef<HTMLDivElement>(null)
-  const session = sessionManager.getCurrentSessionSaved();
-  // Check if this is a document upload message
-  const isDocumentMessage = message.text.includes('[Uploaded ') && message.text.includes('file:')
+  const session = sessionManager.getCurrentSessionSaved()
 
-  // Extract document info if this is a document message
+  const isDocumentMessage = text.includes('[Uploaded ') && text.includes('file:')
+
   const extractDocumentInfo = () => {
     if (!isDocumentMessage) return null
 
-    // Parse the upload message format [Uploaded EXTENSION file: filename]
     const regex = /\[Uploaded ([A-Z]+) file: (.*?)\]/
-    const match = message.text.match(regex)
+    const match = text.match(regex)
 
     if (match && match.length >= 3) {
       const fileExtension = match[1]
       const fileName = match[2]
 
-      // Determine file type based on extension
       let fileType = 'application/octet-stream'
       switch (fileExtension.toLowerCase()) {
         case 'pdf':
@@ -66,8 +66,7 @@ export default function ChatMessage({ message }: ChatMessageProps) {
           break
       }
 
-      // Check if content is still processing or has been processed
-      const isProcessing = message.text.includes('Processing document...')
+      const isProcessing = text.includes('Processing document...')
 
       return { fileType, fileName, isProcessing }
     }
@@ -77,7 +76,6 @@ export default function ChatMessage({ message }: ChatMessageProps) {
 
   const documentInfo = extractDocumentInfo()
 
-  // Show export tools on hover for messages with tables
   const handleMouseEnter = () => {
     if (hasTable) {
       setShowExportTools(true)
@@ -90,20 +88,16 @@ export default function ChatMessage({ message }: ChatMessageProps) {
 
   return (
     <div
-      className={`${hasTable ? 'w-full' : 'max-w-3xl'} ${message.sender === "user" ? "ml-auto" : "mr-auto"}`}
+      className={`${hasTable ? 'w-full' : 'max-w-3xl'} ${sender === "user" ? "ml-auto" : "mr-auto"}`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       ref={messageRef}
     >
       <div className="flex gap-1 items-center">
-        <div>
-          <LogoIcon width={20} height={20} color={message.sender === "user" ? "#6366F1" : "#1F2937"} />
-        </div>
+        <LogoIcon width={20} height={20} color={sender === "user" ? "#6366F1" : "#1F2937"} />
         <h3 className="font-semibold">
-          {message.sender === "user" ? "You" : "Travel Assistant"}
+          {sender === "user" ? "You" : "Travel Assistant"}
         </h3>
-
-        {/* Show document indicator for document messages */}
         {documentInfo && (
           <DocumentIndicator
             fileType={documentInfo.fileType}
@@ -111,14 +105,14 @@ export default function ChatMessage({ message }: ChatMessageProps) {
           />
         )}
       </div>
+
       <div
-        className={`mt-1 p-4 rounded-lg ${message.sender === "user"
-            ? "bg-indigo-100 text-gray-800"
-            : "bg-white text-gray-700 shadow-sm"
+        className={`mt-1 p-4 rounded-lg ${sender === "user"
+          ? "bg-indigo-100 text-gray-800"
+          : "bg-white text-gray-700 shadow-sm"
           }`}
       >
         {isDocumentMessage ? (
-          // For document uploads, show a special message
           <div>
             <div className="flex items-center justify-between mb-2">
               <p className="font-medium flex items-center">
@@ -135,13 +129,10 @@ export default function ChatMessage({ message }: ChatMessageProps) {
                     title="View document"
                     onClick={() => {
                       const element = document.createElement('div');
-                      element.innerHTML = message.text;
-                      // Select and copy the content to clipboard
+                      element.innerHTML = text;
                       window.getSelection()?.selectAllChildren(element);
                       document.execCommand('copy');
                       window.getSelection()?.removeAllRanges();
-
-                      // Show a copy notification
                       alert('Document content copied to clipboard!');
                     }}
                   >
@@ -155,7 +146,6 @@ export default function ChatMessage({ message }: ChatMessageProps) {
               )}
             </div>
 
-            {/* Show a loading indicator if document is still processing */}
             {documentInfo?.isProcessing ? (
               <div className="flex items-center text-gray-500 text-sm">
                 <div className="animate-spin w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full mr-2"></div>
@@ -163,13 +153,11 @@ export default function ChatMessage({ message }: ChatMessageProps) {
               </div>
             ) : (
               <div className="text-sm max-h-60 overflow-y-auto whitespace-pre-wrap bg-gray-50 p-3 rounded-md">
-                {message.text.split("Content:")[1]?.trim() ||
-                  "Processing document content..."}
+                {text.split("Content:")[1]?.trim() || "Processing document content..."}
               </div>
             )}
           </div>
         ) : (
-          // For regular messages, render markdown
           <Markdown
             components={{
               table: ({ ...props }) => (
@@ -192,18 +180,15 @@ export default function ChatMessage({ message }: ChatMessageProps) {
             }}
             remarkPlugins={[remarkGfm]}
           >
-            {message.text}
+            {text}
           </Markdown>
         )}
 
-        {/* Export tools for tables */}
         {hasTable && (
-          <div
-            className={`mt-4 transition-opacity duration-200 ${showExportTools ? 'opacity-100' : 'opacity-60'}`}
-          >
+          <div className={`mt-4 transition-opacity duration-200 ${showExportTools ? 'opacity-100' : 'opacity-60'}`}>
             <SaveTableSessionButton initialSaveStatus={session} />
             <TableExportButton
-              messageText={message.text}
+              messageText={text}
               filename="travel_itinerary"
             />
           </div>
