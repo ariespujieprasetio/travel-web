@@ -408,7 +408,7 @@ export default function LandingPage() {
               <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 text-2xl font-bold mx-auto mb-4">1</div>
               <h3 className="text-xl font-semibold mb-2">Tell Us Your Travel Plans</h3>
               <p className="text-gray-600">
-                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Non, praesentium?
+                Seamless travel arrangements tailored for busy professionals. Where do you want to go next?
               </p>
             </motion.div>
 

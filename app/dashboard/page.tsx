@@ -155,7 +155,7 @@ export default function Dashboard() {
                 <LogoIcon width={24} height={24} color="white" />
               </div>
               <div>
-                <Typography variant="h1" className="text-xl font-bold">Velutara</Typography>
+                <Typography variant="h1" className="text-xl font-bold">Velutara <span className="text-xl font-bold text-neutral-300">2.0</span></Typography>
                 <Typography variant="body2" className="text-gray-500">Your travel AI assistant</Typography>
               </div>
             </div>
