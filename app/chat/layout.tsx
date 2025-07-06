@@ -128,8 +128,8 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
       const activeId = sessionStorage.getItem('activeSessionId')
       if (activeId === sessionToDelete.id) sessionStorage.removeItem('activeSessionId')
     } catch (err) {
-      console.error("Gagal menghapus sesi:", err)
-      alert("Gagal menghapus sesi. Coba lagi.")
+      console.error("Failed to delete session:", err);
+      alert("Failed to delete session. Please try again.");
     }
     setSessionToDelete(null)
   }
@@ -153,7 +153,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
             <Image src={"/android-chrome-512x512.png"} width={240} height={240} alt="logo" />
           </div>
           <Link href={"/dashboard"}>
-            <Typography variant="h1" className="text-xl font-bold">VELUTARA</Typography>
+            <Typography variant="h1" className="text-xl font-bold">VELUTARA <span className="text-xl font-bold text-neutral-300">2.0</span></Typography>
           </Link>
           <button className="ml-auto text-gray-500 hover:text-gray-700 lg:hidden" onClick={() => setSidebarOpen(false)}>
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -280,20 +280,20 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
           <div className="bg-white p-6 rounded-lg shadow-lg w-[90%] max-w-sm">
             <h2 className="text-lg font-semibold mb-2 text-gray-800">Hapus Sesi Chat?</h2>
             <p className="text-sm text-gray-600 mb-4">
-              Apakah kamu yakin ingin menghapus sesi <strong>{sessionToDelete.title || 'New Conversation'}</strong>?
+              Are you sure you want to delete the session <strong>{sessionToDelete.title || 'New Conversation'}</strong>?
             </p>
             <div className="flex justify-end gap-3">
               <button
                 onClick={() => setSessionToDelete(null)}
                 className="px-4 py-2 text-sm border border-gray-300 rounded hover:bg-gray-100"
               >
-                Batal
+                Cancel
               </button>
               <button
                 onClick={handleDeleteConfirmed}
                 className="px-4 py-2 text-sm bg-red-600 text-white rounded hover:bg-red-700"
               >
-                Hapus
+                Delete
               </button>
             </div>
           </div>
