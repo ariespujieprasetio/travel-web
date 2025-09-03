@@ -17,26 +17,32 @@ interface JsPDFWithAutoTable extends jsPDF {
     };
     headStyles?: {
       fillColor?: number[] | number;
-      textColor?: number;
+      textColor?: number[] | number;
       [k: string]: any;
     };
     margin?: { top?: number; right?: number; bottom?: number; left?: number };
     columnStyles?: Record<number, any>;
     didDrawPage?: (data: any) => void;
+    tableWidth?: 'auto' | 'wrap' | number;
+    alternateRowStyles?:  {
+      fillColor?: number[] | number;
+      textColor?: number[] | number;
+      [k: string]: any;
+    };
   }) => void;
   lastAutoTable?: {
     finalY: number;
   };
 }
 
-// ================== Table structures (existing) ==================
+// ================== Table structures ==================
 /** Represents a table data structure */
 export interface TableData {
   headers: string[];
   rows: string[][];
 }
 
-// ================== Markdown table utils (existing) ==================
+// ================== Markdown table utils ==================
 /** Parse markdown table into a structured format */
 export function parseMarkdownTable(markdownTable: string): TableData {
   const lines = markdownTable.trim().split('\n');
@@ -76,7 +82,7 @@ export function extractTablesFromMarkdown(markdownText: string): TableData[] {
   return tables;
 }
 
-// ================== CSV/XLSX/PDF exports (existing) ==================
+// ================== CSV/XLSX/PDF exports ==================
 /** Export multiple tables to a single CSV file */
 export function exportToCSV(tables: TableData[], filename: string = 'tables.csv'): void {
   const csvFilename = filename.endsWith('.csv') ? filename : `${filename}.csv`;
@@ -202,7 +208,7 @@ export function exportTablesFromMarkdown(
   if (!tables.length) {
     console.warn('No tables found in the markdown text');
     return;
-    }
+  }
   const filename = baseFilename.replace(/\.(csv|xlsx|pdf)$/, '');
   const full = `${filename}.${format}`;
 
@@ -219,13 +225,10 @@ export function containsMarkdownTable(text: string): boolean {
   return tablePattern.test(text);
 }
 
-// ================== MODELED ITINERARY EXPORT (sys-new.txt) ==================
+// ================== MODELED ITINERARY EXPORT ==================
 
 /**
- * Cari pesan bot terbaru yang:
- * - dari assistant/bot
- * - mengandung heading H1 (# Title)
- * - dan tabel itinerary dengan header "DAY | DESTINATION ..."
+ * Cari pesan bot terbaru yang mengandung itinerary modeled
  */
 function findLatestModeledMessage(
   messages: Array<{ sender?: string; role?: string; text?: string; content?: string }>
@@ -236,7 +239,8 @@ function findLatestModeledMessage(
     if (!isAssistant(msg)) continue;
     const body = (msg.content ?? msg.text ?? '').toString();
     if (!body) continue;
-    if (/#\s.+/i.test(body) && /\|\s*DAY\s*\|\s*DESTINATION/i.test(body)) {
+    // Check for itinerary indicators
+    if (body.includes('|') && (/#\s.+/i.test(body) || /day\s*\d+/i.test(body) || /itinerary/i.test(body))) {
       return body;
     }
   }
@@ -244,14 +248,14 @@ function findLatestModeledMessage(
 }
 
 type ParsedItinerary = {
-  title?: string;            // H1
-  accommodation?: string;    // **ACCOMMODATION**: ...
-  transportType?: string;    // **TYPE OF TRANSPORT**: ...
-  dailyBudget?: string;      // **DAILY BUDGET**: ...
+  title?: string;
+  accommodation?: string;
+  transportType?: string;
+  dailyBudget?: string;
   itineraryTable?: TableData;
-  transportDocTitle?: string; // "Transportation Logistics Documentation"
+  transportDocTitle?: string;
   transportTable?: TableData;
-  budgetSummaryTitle?: string; // "BUDGET SUMMARY"
+  budgetSummaryTitle?: string;
   budgetLines?: Array<{ label: string; value: string }>;
 };
 
@@ -271,10 +275,10 @@ function parseModeledItinerary(md: string): ParsedItinerary {
     const val = m[2].trim();
     if (key.includes('accommodation')) out.accommodation = val;
     else if (key.includes('type of transport')) out.transportType = val;
-    else if (key.includes('daily budget')) out.dailyBudget = val;
+    else if (key.includes('daily budget') || key.includes('budget per day')) out.dailyBudget = val;
   }
 
-  // Extract tables: [0] itinerary, [1] transport docs (jika ada)
+  // Extract tables
   const tables = extractTablesFromMarkdown(md);
   if (tables.length > 0) out.itineraryTable = tables[0];
   if (tables.length > 1) out.transportTable = tables[1];
@@ -283,23 +287,27 @@ function parseModeledItinerary(md: string): ParsedItinerary {
   const transTitle = md.match(/^\s*##\s+Transportation Logistics Documentation\s*$/mi);
   if (transTitle) out.transportDocTitle = 'Transportation Logistics Documentation';
 
-  // Budget summary block
-  const budgetBlock = md.match(/\*\*BUDGET SUMMARY\*\*([\s\S]*?)$/i);
+  // Budget summary block - lebih fleksibel
+  const budgetBlock = md.match(/(?:\*\*)?(?:BUDGET\s*SUMMARY|Budget\s*Summary|TOTAL\s*COST|Total\s*Cost)(?:\*\*)?[\s\S]*?(?=\n\n|\n#|$)/i);
   if (budgetBlock) {
     out.budgetSummaryTitle = 'BUDGET SUMMARY';
-    const block = budgetBlock[1];
-    const lineRegex = /^\s*\*\*(.+?)\*\*\s*:\s*(.+)\s*$/gm;
+    const block = budgetBlock[0];
+    const lineRegex = /(?:\*\*(.+?)\*\*\s*:|\*\*?(.+?)\*\*?\s*:|\-\s*(.+?):)\s*(.+)$/gm;
     const lines: Array<{ label: string; value: string }> = [];
     let lm: RegExpExecArray | null;
     while ((lm = lineRegex.exec(block)) !== null) {
-      lines.push({ label: lm[1].trim(), value: lm[2].trim() });
+      const label = (lm[1] || lm[2] || lm[3] || '').trim();
+      const value = (lm[4] || '').trim();
+      if (label && value) {
+        lines.push({ label, value });
+      }
     }
     out.budgetLines = lines;
   }
   return out;
 }
 
-/** Export itinerary modeled → PDF persis gaya sys-new.txt */
+/** Export itinerary modeled → PDF dengan format Travel Planner */
 export function exportModeledItineraryToPDF(
   messages: Array<{ sender?: string; role?: string; text?: string; content?: string }>,
   filename: string = 'itinerary.pdf'
@@ -312,84 +320,318 @@ export function exportModeledItineraryToPDF(
   const parsed = parseModeledItinerary(md);
 
   const doc = new jsPDF({ orientation: 'landscape' }) as JsPDFWithAutoTable;
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
 
-  // Header
-  let y = 18;
+  let y = 15;
+  const leftMargin = 15;
+  const rightMargin = 15;
+  const contentWidth = pageWidth - leftMargin - rightMargin;
+
+  // Extract dynamic info dari parsed data dan original message
+  const titleText = parsed.title || 'Travel Itinerary';
+  
+  // Extract tanggal dari title atau content
+  const dateMatches = md.match(/(\d{1,2}[-\s](?:January|February|March|April|May|June|July|August|September|October|November|December)[-\s]\d{4})|(\d{1,2}\/\d{1,2}\/\d{4})|(\d{4}-\d{2}-\d{2})/gi);
+  const locationMatches = md.match(/(Tokyo|Japan|Yogyakarta|Indonesia|Singapore|Bangkok|Seoul|Korea|Thailand|Malaysia|Kuala Lumpur|Philippines|Manila|Vietnam|Ho Chi Minh|Hanoi|Myanmar|Yangon|Cambodia|Phnom Penh|Laos|Vientiane|Brunei|Bandar Seri Begawan|Paris|France|London|England|UK|Rome|Italy|Berlin|Germany|Madrid|Spain|Amsterdam|Netherlands|New York|USA|America|Sydney|Australia|Cairo|Egypt|Barcelona|[A-Z][a-z]+ [A-Z][a-z]+)/gi);
+  
+  // Extract duration dari content
+  const durationMatch = md.match(/(\d+)[\s-]*(day|days)/i);
+  const duration = durationMatch ? durationMatch[1] : '3';
+  
+  // Extract person count dari content
+  const personMatch = md.match(/(\d+)\s*(?:person|people|traveler|travelers|pax)/i);
+  const personCount = personMatch ? `${personMatch[1]} person${parseInt(personMatch[1]) > 1 ? 's' : ''}` : '1 person';
+  
+  const dateInfo = dateMatches ? dateMatches.slice(0, 2).join(' - ') : 'Date not specified';
+  const locationInfo = locationMatches ? locationMatches[0] : 'Destination';
+
+  // Extract major events dari content
+  let majorEventText = '';
+  const eventMatches = md.match(/(?:festival|event|celebration|matsuri|holiday|concert|exhibition)[\s\S]*?(?=\n\n|\.|Day|##)/gi);
+  if (eventMatches) {
+    majorEventText = eventMatches[0].substring(0, 50) + '...';
+  }
+
+  // Extract weather info dari content
+  let weatherInfo = 'Please check local weather forecast';
+  const weatherMatch = md.match(/(?:temperature|weather|climate)[\s\S]*?(\d+°?[CF]?)/i);
+  if (weatherMatch) {
+    weatherInfo = `Temperature around ${weatherMatch[1]}`;
+  }
+
+  // Extract news/updates dari content
+  let newsInfo = '';
+  const newsMatch = md.match(/(?:news|update|alert|warning|notice)[\s\S]*?(?=\n\n|\.|Day)/i);
+  if (newsMatch) {
+    newsInfo = newsMatch[0].substring(0, 100) + '...';
+  }
+
+  // Tentukan nationalDayText
+  let nationalDayText = `No major national holidays during ${dateInfo}`;
+  const holidayMatch = md.match(/(?:holiday|national day|public holiday)[\s\S]*?(?=\n\n|\.|Day)/i);
+  if (holidayMatch) {
+    nationalDayText = holidayMatch[0].substring(0, 80) + '...';
+  }
+
+  // ======= HEADER TRAVEL PLANNER PALING ATAS =======
+  y = 20;
+  const headerHeight = 23; // lebih tinggi agar jarak atas-bawah seimbang
+  doc.setFillColor(153, 51, 255); // ungu
+  doc.rect(leftMargin, y, contentWidth, headerHeight, 'F');
   doc.setFontSize(16);
-  doc.text(parsed.title || 'Itinerary', 14, y);
-  y += 8;
+  doc.setTextColor(255, 255, 255);
+  doc.setFont('helvetica', 'bold');
+  doc.text('TRAVEL PLANNER', pageWidth / 2, y + headerHeight / 2, { align: 'center', baseline: 'middle' });
+  y += headerHeight + 10;
 
-  // Subinfo (Accommodation/Transport/Budget)
-  doc.setFontSize(10);
-  const sub: string[] = [];
-  if (parsed.accommodation) sub.push(`ACCOMMODATION: ${parsed.accommodation}`);
-  if (parsed.transportType) sub.push(`TYPE OF TRANSPORT: ${parsed.transportType}`);
-  if (parsed.dailyBudget) sub.push(`DAILY BUDGET: ${parsed.dailyBudget}`);
-  sub.forEach((line) => { doc.text(line, 14, y); y += 6; });
-  if (sub.length) y += 2;
+  // ======= TABEL INFO UTAMA (Date, Country, Person) =======
+  const infoMainTableBody: string[][] = [
+    ['Date', ':', dateInfo],
+    ['Country', ':', locationInfo],
+    ['Person', ':', personCount]
+  ];
+  doc.autoTable({
+    body: infoMainTableBody,
+    startY: y,
+    theme: 'grid',
+    styles: {
+      fontSize: 10,
+      cellPadding: 3,
+      lineColor: [0, 0, 0],
+      lineWidth: 0.2, // garis lebih tipis
+      valign: 'top',
+      textColor: [0, 0, 0]
+    },
+    columnStyles: {
+      0: { cellWidth: 60, fontStyle: 'bold', halign: 'left' },
+      1: { cellWidth: 10, halign: 'center' },
+      2: { cellWidth: contentWidth - 70 }
+    },
+    margin: { left: leftMargin, right: rightMargin },
+    tableWidth: contentWidth
+  });
+  y = doc.lastAutoTable?.finalY ? doc.lastAutoTable.finalY : y + 30;
 
-  // Tabel Itinerary (wajib)
+  // ======= TABEL DETAIL (Major Event, National Day, Weather, News) =======
+  doc.autoTable({
+    head: [['Information Detail']],
+    body: [],
+    startY: y,
+    theme: 'plain', // tanpa grid
+    headStyles: {
+      fillColor: [153, 51, 255],
+      textColor: [255, 255, 255],
+      fontSize: 13,
+      fontStyle: 'bold',
+      halign: 'center',
+      valign: 'middle',
+      lineWidth: 0,
+      lineColor: [0, 0, 0]
+    },
+    styles: {
+      fontSize: 10,
+      cellPadding: 3,
+      lineWidth: 0,
+      halign: 'center',
+      valign: 'middle',
+      textColor: [0, 0, 0]
+    },
+    columnStyles: {
+      0: { cellWidth: contentWidth, halign: 'center' }
+    },
+    margin: { left: leftMargin, right: rightMargin },
+    tableWidth: contentWidth
+  });
+  y = doc.lastAutoTable?.finalY ? doc.lastAutoTable.finalY : y + 15;
+  doc.autoTable({
+    body: [
+      ['Major Event', ':', majorEventText || '-'],
+      ['National Day', ':', nationalDayText],
+      ['Weather', ':', weatherInfo],
+      ['News', ':', newsInfo || '-']
+    ],
+    startY: y,
+    theme: 'grid',
+    styles: {
+      fontSize: 10,
+      cellPadding: 3,
+      lineColor: [0, 0, 0],
+      lineWidth: 0.2,
+      valign: 'top',
+      textColor: [0, 0, 0]
+    },
+    columnStyles: {
+      0: { cellWidth: 60, fontStyle: 'bold', halign: 'left' },
+      1: { cellWidth: 10, halign: 'center' },
+      2: { cellWidth: contentWidth - 70, halign: 'left' }
+    },
+    margin: { left: leftMargin, right: rightMargin },
+    tableWidth: contentWidth
+  });
+  y = doc.lastAutoTable?.finalY ? doc.lastAutoTable.finalY + 8 : y + 40;
+
+  // Itinerary Tables berdasarkan data aktual
   if (parsed.itineraryTable) {
-    const normalized = parsed.itineraryTable.rows.map((row) => {
-      const padded = [...row];
-      while (padded.length < parsed.itineraryTable!.headers.length) padded.push('');
-      return padded;
+    // Group rows by day
+    const dayGroups: { [key: string]: string[][] } = {};
+    parsed.itineraryTable.rows.forEach(row => {
+      let dayValue = 'DAY 1';
+      
+      const dayColIndex = parsed.itineraryTable!.headers.findIndex(h => 
+        h.toLowerCase().includes('day')
+      );
+      
+      if (dayColIndex >= 0 && row[dayColIndex]) {
+        dayValue = row[dayColIndex].toUpperCase().includes('DAY') ? row[dayColIndex] : `DAY ${row[dayColIndex]}`;
+      } else if (row[0] && /day\s*\d+/i.test(row[0])) {
+        dayValue = row[0];
+      }
+      
+      if (!dayGroups[dayValue]) dayGroups[dayValue] = [];
+      dayGroups[dayValue].push(row);
     });
 
-    doc.autoTable({
-      head: [parsed.itineraryTable.headers],
-      body: normalized,
-      startY: y,
-      theme: 'grid',
-      styles: { fontSize: 9, cellPadding: 3, valign: 'top' },
-      headStyles: { fillColor: [75, 58, 172], textColor: 255 },
-      columnStyles: {
-        0: { cellWidth: 18 }, // DAY sempit
-        // lainnya auto (akan wrap)
-      },
-      margin: { top: 14, left: 14, right: 14, bottom: 14 },
+    const dayKeys = Object.keys(dayGroups).sort();
+    
+    dayKeys.forEach((dayKey, dayIndex) => {
+      if (dayIndex > 0 || y > pageHeight - 100) {
+        doc.addPage();
+        y = 25;
+      }
+      doc.autoTable({
+        head: [[dayKey.toUpperCase()]],
+        body: [],
+        startY: y,
+        theme: 'plain',
+        headStyles: {
+          fillColor: [153, 51, 255],
+          textColor: [255, 255, 255],
+          fontSize: 12,
+          fontStyle: 'bold',
+          halign: 'center',
+          valign: 'middle',
+          lineWidth: 0.2,
+          lineColor: [0, 0, 0]
+        },
+        margin: { left: leftMargin, right: rightMargin },
+        tableWidth: contentWidth,
+        columnStyles: {
+          0: { cellWidth: contentWidth }
+        }
+      });
+      y = doc.lastAutoTable?.finalY ?? y;
+      const dayRows = dayGroups[dayKey];
+      const headers = parsed.itineraryTable!.headers.map(h => h.toLowerCase());
+      const mappedRows: string[][] = dayRows.map(row => {
+        const timeIdx = headers.findIndex(h => h.includes('time') && !h.includes('travel'));
+        const activityIdx = headers.findIndex(h => h.includes('activity') || h.includes('event') || h.includes('place'));
+        const locationIdx = headers.findIndex(h => h.includes('location') || h.includes('venue') || h.includes('destination'));
+        const priceIdx = headers.findIndex(h => h.includes('price') || h.includes('cost') || h.includes('budget'));
+        const addressIdx = headers.findIndex(h => h.includes('address') || h.includes('addr'));
+        const travelTimeIdx = headers.findIndex(h => (h.includes('travel') && h.includes('time')) || h.includes('duration') || h.includes('transport time'));
+        const noteIdx = headers.findIndex(h => h.includes('note') || h.includes('description') || h.includes('detail') || h.includes('remark'));
+        return [
+          timeIdx >= 0 ? row[timeIdx] || '' : (row[0] || ''),
+          activityIdx >= 0 ? row[activityIdx] || '' : (row[1] || ''),
+          locationIdx >= 0 ? row[locationIdx] || '' : (row[2] || ''),
+          priceIdx >= 0 ? row[priceIdx] || '' : (row[3] || ''),
+          addressIdx >= 0 ? row[addressIdx] || '' : (row[4] || ''),
+          travelTimeIdx >= 0 ? row[travelTimeIdx] || '' : (row[5] || ''),
+          noteIdx >= 0 ? row[noteIdx] || '' : (row[6] || '')
+        ];
+      });
+      doc.autoTable({
+        head: [['Time', 'Activity', 'Location', 'Price', 'Address', 'Time Travel', 'Note']],
+        body: mappedRows,
+        startY: y,
+        theme: 'grid',
+        styles: {
+          fontSize: 9,
+          cellPadding: 3,
+          lineColor: [0, 0, 0],
+          lineWidth: 0.2,
+          textColor: [0, 0, 0]
+        },
+        headStyles: {
+          fillColor: [153, 51, 255],
+          textColor: [255, 255, 255],
+          fontSize: 9,
+          fontStyle: 'bold',
+          halign: 'center',
+          lineWidth: 0.2
+        },
+        columnStyles: {
+          0: { cellWidth: contentWidth / 7, halign: 'center' },
+          1: { cellWidth: contentWidth / 7 },
+          2: { cellWidth: contentWidth / 7 },
+          3: { cellWidth: contentWidth / 7, halign: 'center' },
+          4: { cellWidth: contentWidth / 7 },
+          5: { cellWidth: contentWidth / 7, halign: 'center' },
+          6: { cellWidth: contentWidth / 7 }
+        },
+        margin: { left: leftMargin, right: rightMargin },
+        tableWidth: contentWidth
+      });
+      y = (doc.lastAutoTable?.finalY ?? y + 15) + 8;
     });
-
-    y = (doc.lastAutoTable?.finalY || y) + 10;
   }
 
-  // Transportation Logistics Documentation (opsional)
-  if (parsed.transportTable) {
-    doc.setFontSize(12);
-    doc.text(parsed.transportDocTitle || 'Transportation Logistics', 14, y);
-    y += 6;
-
-    const normalized = parsed.transportTable.rows.map((row) => {
-      const padded = [...row];
-      while (padded.length < parsed.transportTable!.headers.length) padded.push('');
-      return padded;
+  // --- Pisahkan ke halaman baru ---
+  doc.addPage();
+  y = 30;
+  doc.autoTable({
+    head: [['BUDGET SUMMARY']],
+    body: [],
+    startY: y,
+    theme: 'plain',
+    headStyles: {
+      fillColor: [153, 51, 255],
+      textColor: [255, 255, 255],
+      fontSize: 12,
+      fontStyle: 'bold',
+      halign: 'center',
+      valign: 'middle',
+      lineWidth: 0.2,
+      lineColor: [0, 0, 0]
+    },
+    margin: { left: leftMargin, right: rightMargin },
+    tableWidth: contentWidth,
+    columnStyles: {
+      0: { cellWidth: contentWidth }
+    }
+  });
+  y = doc.lastAutoTable?.finalY ?? y;
+  const budgetTableBody: string[][] = [];
+  if (parsed.budgetLines && parsed.budgetLines.length > 0) {
+    parsed.budgetLines.forEach(line => {
+      budgetTableBody.push([line.label, ':', line.value]);
     });
-
-    doc.autoTable({
-      head: [parsed.transportTable.headers],
-      body: normalized,
-      startY: y,
-      theme: 'grid',
-      styles: { fontSize: 9, cellPadding: 3, valign: 'top' },
-      headStyles: { fillColor: [230, 230, 230], textColor: 20 },
-      margin: { top: 14, left: 14, right: 14, bottom: 14 },
-    });
-
-    y = (doc.lastAutoTable?.finalY || y) + 10;
+  } else {
+    budgetTableBody.push(['Total Estimated Cost', ':', 'Not specified']);
+    budgetTableBody.push(['Daily Average Per Person', ':', parsed.dailyBudget || 'Not specified']);
+    budgetTableBody.push(['Accommodation', ':', parsed.accommodation || 'Not specified']);
+    budgetTableBody.push(['Transportation', ':', parsed.transportType || 'Not specified']);
   }
-
-  // Budget Summary (opsional)
-  if (parsed.budgetLines && parsed.budgetLines.length) {
-    doc.setFontSize(12);
-    doc.text(parsed.budgetSummaryTitle || 'BUDGET SUMMARY', 14, y);
-    y += 6;
-
-    doc.setFontSize(10);
-    parsed.budgetLines.forEach((ln) => {
-      doc.text(`• ${ln.label}: ${ln.value}`, 16, y);
-      y += 5;
-    });
-  }
+  doc.autoTable({
+    body: budgetTableBody,
+    startY: y,
+    theme: 'grid',
+    styles: {
+      fontSize: 10,
+      cellPadding: 3,
+      lineColor: [0, 0, 0],
+      lineWidth: 0.2,
+      textColor: [0, 0, 0]
+    },
+    columnStyles: {
+      0: { cellWidth: 60, fontStyle: 'bold', halign: 'left' },
+      1: { cellWidth: 10, halign: 'center' },
+      2: { cellWidth: contentWidth - 70, halign: 'left' }
+    },
+    margin: { left: leftMargin, right: rightMargin },
+    tableWidth: contentWidth
+  });
 
   const pdfFilename = filename.endsWith('.pdf') ? filename : `${filename}.pdf`;
   doc.save(pdfFilename);

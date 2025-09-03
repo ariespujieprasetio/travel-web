@@ -274,11 +274,11 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
         {!loading && children}
       </main>
 
-      {/* Modal Hapus Session */}
+      {/* Delete Session Modal */}
       {sessionToDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-[90%] max-w-sm">
-            <h2 className="text-lg font-semibold mb-2 text-gray-800">Hapus Sesi Chat?</h2>
+            <h2 className="text-lg font-semibold mb-2 text-gray-800">Delete Chat Session?</h2>
             <p className="text-sm text-gray-600 mb-4">
               Are you sure you want to delete the session <strong>{sessionToDelete.title || 'New Conversation'}</strong>?
             </p>

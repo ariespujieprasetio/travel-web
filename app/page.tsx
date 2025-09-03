@@ -294,85 +294,95 @@ export default function LandingPage() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+
+  {/* Bangkok */}
+  <a href="https://en.wikipedia.org/wiki/Bangkok" target="_blank" rel="noopener noreferrer"
+     className="group rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow relative bg-white border border-gray-100">
+    <div className="h-48 bg-pink-50 flex items-center justify-center">
+      <img src="/icons/bangkok.png" alt="Bangkok" className="w-24 h-24 object-contain group-hover:scale-110 transition-transform" />
+    </div>
+    <div className="p-4">
+      <h3 className="text-xl font-bold mb-1 group-hover:text-purple-700 transition-colors">Bangkok, Thailand</h3>
+    </div>
+  </a>
+
   {/* Dubai */}
-  <div className="group rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow relative bg-white border border-gray-100">
+  <a href="https://en.wikipedia.org/wiki/Dubai" target="_blank" rel="noopener noreferrer"
+     className="group rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow relative bg-white border border-gray-100">
     <div className="h-48 bg-yellow-50 flex items-center justify-center">
       <img src="/icons/dubai.png" alt="Dubai" className="w-24 h-24 object-contain group-hover:scale-110 transition-transform" />
     </div>
     <div className="p-4">
       <h3 className="text-xl font-bold mb-1 group-hover:text-purple-700 transition-colors">Dubai, UAE</h3>
     </div>
-  </div>
-
-  {/* Tokyo */}
-  <div className="group rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow relative bg-white border border-gray-100">
-    <div className="h-48 bg-red-50 flex items-center justify-center">
-      <img src="/icons/tokyo.png" alt="Tokyo" className="w-24 h-24 object-contain group-hover:scale-110 transition-transform" />
-    </div>
-    <div className="p-4">
-      <h3 className="text-xl font-bold mb-1 group-hover:text-purple-700 transition-colors">Tokyo, Japan</h3>
-    </div>
-  </div>
-
-  {/* Shanghai */}
-  <div className="group rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow relative bg-white border border-gray-100">
-    <div className="h-48 bg-pink-50 flex items-center justify-center">
-      <img src="/icons/shanghai.png" alt="Shanghai" className="w-24 h-24 object-contain group-hover:scale-110 transition-transform" />
-    </div>
-    <div className="p-4">
-      <h3 className="text-xl font-bold mb-1 group-hover:text-purple-700 transition-colors">Shanghai, China</h3>
-    </div>
-  </div>
-
-  {/* New York */}
-  <div className="group rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow relative bg-white border border-gray-100">
-    <div className="h-48 bg-gray-50 flex items-center justify-center">
-      <img src="/icons/newyork.png" alt="New York" className="w-24 h-24 object-contain group-hover:scale-110 transition-transform" />
-    </div>
-    <div className="p-4">
-      <h3 className="text-xl font-bold mb-1 group-hover:text-purple-700 transition-colors">New York City, USA</h3>
-    </div>
-  </div>
-
-  {/* Singapore */}
-  <div className="group rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow relative bg-white border border-gray-100">
-    <div className="h-48 bg-green-50 flex items-center justify-center">
-      <img src="/icons/singapore.png" alt="Singapore" className="w-24 h-24 object-contain group-hover:scale-110 transition-transform" />
-    </div>
-    <div className="p-4">
-      <h3 className="text-xl font-bold mb-1 group-hover:text-purple-700 transition-colors">Singapore</h3>
-    </div>
-  </div>
-
-  {/* London */}
-  <div className="group rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow relative bg-white border border-gray-100">
-    <div className="h-48 bg-indigo-100 flex items-center justify-center">
-      <img src="/icons/london.png" alt="London" className="w-24 h-24 object-contain group-hover:scale-110 transition-transform" />
-    </div>
-    <div className="p-4">
-      <h3 className="text-xl font-bold mb-1 group-hover:text-purple-700 transition-colors">London, UK</h3>
-    </div>
-  </div>
-
-  {/* Seoul */}
-  <div className="group rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow relative bg-white border border-gray-100">
-    <div className="h-48 bg-purple-50 flex items-center justify-center">
-      <img src="/icons/seoul.png" alt="Seoul" className="w-24 h-24 object-contain group-hover:scale-110 transition-transform" />
-    </div>
-    <div className="p-4">
-      <h3 className="text-xl font-bold mb-1 group-hover:text-purple-700 transition-colors">Seoul, South Korea</h3>
-    </div>
-  </div>
+  </a>
 
   {/* Jakarta */}
-  <div className="group rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow relative bg-white border border-gray-100">
+  <a href="https://en.wikipedia.org/wiki/Jakarta" target="_blank" rel="noopener noreferrer"
+     className="group rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow relative bg-white border border-gray-100">
     <div className="h-48 bg-orange-50 flex items-center justify-center">
       <img src="/icons/jakarta.png" alt="Jakarta" className="w-24 h-24 object-contain group-hover:scale-110 transition-transform" />
     </div>
     <div className="p-4">
       <h3 className="text-xl font-bold mb-1 group-hover:text-purple-700 transition-colors">Jakarta, Indonesia</h3>
     </div>
-  </div>
+  </a>
+
+  {/* Kuala Lumpur */}
+  <a href="https://en.wikipedia.org/wiki/Kuala_Lumpur" target="_blank" rel="noopener noreferrer"
+     className="group rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow relative bg-white border border-gray-100">
+    <div className="h-48 bg-green-100 flex items-center justify-center">
+      <img src="/icons/kualalumpur.png" alt="Kuala Lumpur" className="w-24 h-24 object-contain group-hover:scale-110 transition-transform" />
+    </div>
+    <div className="p-4">
+      <h3 className="text-xl font-bold mb-1 group-hover:text-purple-700 transition-colors">Kuala Lumpur, Malaysia</h3>
+    </div>
+  </a>
+
+  {/* Manila */}
+  <a href="https://en.wikipedia.org/wiki/Manila" target="_blank" rel="noopener noreferrer"
+     className="group rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow relative bg-white border border-gray-100">
+    <div className="h-48 bg-blue-50 flex items-center justify-center">
+      <img src="/icons/manila.png" alt="Manila" className="w-24 h-24 object-contain group-hover:scale-110 transition-transform" />
+    </div>
+    <div className="p-4">
+      <h3 className="text-xl font-bold mb-1 group-hover:text-purple-700 transition-colors">Manila, Philippines</h3>
+    </div>
+  </a>
+
+  {/* Seoul */}
+  <a href="https://en.wikipedia.org/wiki/Seoul" target="_blank" rel="noopener noreferrer"
+     className="group rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow relative bg-white border border-gray-100">
+    <div className="h-48 bg-purple-50 flex items-center justify-center">
+      <img src="/icons/seoul.png" alt="Seoul" className="w-24 h-24 object-contain group-hover:scale-110 transition-transform" />
+    </div>
+    <div className="p-4">
+      <h3 className="text-xl font-bold mb-1 group-hover:text-purple-700 transition-colors">Seoul, South Korea</h3>
+    </div>
+  </a>
+
+  {/* Singapore */}
+  <a href="https://en.wikipedia.org/wiki/Singapore" target="_blank" rel="noopener noreferrer"
+     className="group rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow relative bg-white border border-gray-100">
+    <div className="h-48 bg-green-50 flex items-center justify-center">
+      <img src="/icons/singapore.png" alt="Singapore" className="w-24 h-24 object-contain group-hover:scale-110 transition-transform" />
+    </div>
+    <div className="p-4">
+      <h3 className="text-xl font-bold mb-1 group-hover:text-purple-700 transition-colors">Singapore</h3>
+    </div>
+  </a>
+
+  {/* Tokyo */}
+  <a href="https://en.wikipedia.org/wiki/Tokyo" target="_blank" rel="noopener noreferrer"
+     className="group rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow relative bg-white border border-gray-100">
+    <div className="h-48 bg-red-50 flex items-center justify-center">
+      <img src="/icons/tokyo.png" alt="Tokyo" className="w-24 h-24 object-contain group-hover:scale-110 transition-transform" />
+    </div>
+    <div className="p-4">
+      <h3 className="text-xl font-bold mb-1 group-hover:text-purple-700 transition-colors">Tokyo, Japan</h3>
+    </div>
+  </a>
+
 </div>
 
 
