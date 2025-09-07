@@ -359,7 +359,7 @@ export default function ChatPage() {
               </h3>
             </div>
             <div className="mt-1 p-3 sm:p-4 rounded-lg bg-white text-gray-700 shadow-sm">
-              <Markdown 
+              <Markdown  
                 components={{
                   table: ({ ...props }) => (
                     <div className="overflow-x-auto">
@@ -370,7 +370,7 @@ export default function ChatPage() {
                     <thead className="bg-gray-100" {...props} />
                   ),
                   tbody: ({ ...props }) => (
-                    <tbody className="bg-white" {...props} />
+                    <tbody className="bg-indigo-100" {...props} />
                   ),
                   th: ({ ...props }) => (
                     <th className="px-2 sm:px-4 py-2 border border-gray-200 text-left text-xs sm:text-sm font-medium text-gray-700" {...props} />
