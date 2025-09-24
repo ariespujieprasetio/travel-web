@@ -184,7 +184,7 @@ export function exportToPDF(
       startY: y,
       theme: 'grid',
       styles: { fontSize: 10, cellPadding: 3 },
-      headStyles: { fillColor: [75, 58, 172], textColor: 255 }
+      headStyles: { fillColor: [153, 51, 255], textColor: 255 }
     });
 
     y = (doc.lastAutoTable?.finalY || y) + 15;
@@ -404,7 +404,7 @@ export function exportModeledItineraryToPDF(
   const pageWidth = doc.internal.pageSize.getWidth();
 
   // ===== PAGE 1: Header =====
-  doc.setFillColor(75, 58, 172); // sama seperti warna tabel
+  doc.setFillColor(153, 51, 255); // sama seperti warna tabel
   doc.rect(0, 0, pageWidth, 20, "F");
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(14);
@@ -431,14 +431,14 @@ export function exportModeledItineraryToPDF(
   let y = doc.lastAutoTable?.finalY || 50;
 
   // Information detail
-  doc.setFillColor(75, 58, 172);
+  doc.setFillColor(153, 51, 255);
   doc.setTextColor(255, 255, 255);
   doc.setFont("helvetica", "bold");
   doc.autoTable({
     body: [["Information Detail"]],
     startY: y + 5,
     theme: "plain",
-    styles: { fontSize: 12, halign: "center", fillColor: [150, 50, 200], textColor: 255 },
+    styles: { fontSize: 12, halign: "center", fillColor: [153, 51, 255], textColor: 255 },
   });
 
   y = doc.lastAutoTable?.finalY || y + 15;
@@ -500,7 +500,7 @@ export function exportModeledItineraryToPDF(
         startY: 20,
         theme: "grid",
         styles: { fontSize: 10, cellPadding: 3 },
-        headStyles: { fillColor: [75, 58, 172], textColor: 255 },
+        headStyles: { fillColor: [153, 51, 255], textColor: 255 },
       });
     });
 
@@ -559,7 +559,7 @@ export function exportModeledItineraryToPDF(
 
     // === RENDER ===
     doc.addPage();
-    doc.setFillColor(75, 58, 172); // sama seperti warna tabel
+    doc.setFillColor(153, 51, 255); // sama seperti warna tabel
     doc.rect(0, 0, pageWidth, 20, "F");
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(14);
@@ -572,7 +572,7 @@ export function exportModeledItineraryToPDF(
       startY: 30,
       theme: "grid",
       styles: { fontSize: 11, cellPadding: 4 },
-      headStyles: { fillColor: [75, 58, 172], textColor: 255 }, // senada
+      headStyles: { fillColor: [153, 51, 255], textColor: 255 }, // senada
       columnStyles: {
         0: { fontStyle: "bold", halign: "left" },
         1: { halign: "center", cellWidth: 5 },
