@@ -297,16 +297,17 @@ function parseModeledItinerary(md: string): ParsedItinerary {
   const titleMatch = md.match(/^\s*#\s+(.+)\s*$/m);
   if (titleMatch) out.title = titleMatch[1].trim();
 
-  // Key-Value Bold lines
-  const kvRegex = /^\s*\*\*(.+?)\*\*\s*:\s*(.+)\s*$/gm;
+  // Key-Value lines (support bold **Key**, normal Key, dash, colon)
+  const kvRegex = /^\s*(?:\*\*)?(.+?)(?:\*\*)?\s*[:\-]\s*(.+)\s*$/gm;
   let m: RegExpExecArray | null;
   while ((m = kvRegex.exec(md)) !== null) {
     const key = m[1].trim().toLowerCase();
     const val = m[2].trim();
     if (key.includes("accommodation")) out.accommodation = val;
-    else if (key.includes("type of transport")) out.transportType = val;
+    else if (key.includes("transport") || key.includes("transportation")) out.transportType = val;
     else if (key.includes("daily budget") || key.includes("budget per day")) out.dailyBudget = val;
   }
+
 
   // Extract tables
   const tables = extractTablesFromMarkdown(md);
@@ -364,14 +365,29 @@ function extractConversationMeta(
 ) {
   const all = messages.map(m => (m.text ?? m.content ?? '')).join('\n');
 
-  // Dates: "October 10, 2025 - October 13, 2025" / "to" / "until"
-  const dateMatch = all.match(
-    /([A-Z][a-z]+ \d{1,2}, \d{4})\s*(?:-|to|until)\s*([A-Z][a-z]+ \d{1,2}, \d{4})/
-  );
-  const dates = dateMatch ? `${dateMatch[1]} - ${dateMatch[2]}` : 'Not specified';
+  // Dates: support multiple formats
+  let dates = "Not specified";
+
+  // Format 1: "October 10, 2025 - October 13, 2025"
+  let m = all.match(/([A-Z][a-z]+ \d{1,2}, \d{4})\s*(?:-|to|until)\s*([A-Z][a-z]+ \d{1,2}, \d{4})/);
+  if (m) {
+    dates = `${m[1]} - ${m[2]}`;
+  } else {
+    // Format 2: "3-5 October 2025" atau "3 - 5 October 2025"
+    m = all.match(/(\d{1,2})\s*-\s*(\d{1,2})\s*([A-Z][a-z]+)\s*(\d{4})/i);
+    if (m) {
+      dates = `${m[1]} ${m[3]} ${m[4]} - ${m[2]} ${m[3]} ${m[4]}`;
+    } else {
+      // Format 3: "Oct 3-5, 2025" / "Okt 3-5, 2025"
+      m = all.match(/([A-Z][a-z]+|Okt|Oktober)\s*(\d{1,2})\s*-\s*(\d{1,2}),?\s*(\d{4})/i);
+      if (m) {
+        dates = `${m[1]} ${m[2]}, ${m[4]} - ${m[1]} ${m[3]}, ${m[4]}`;
+      }
+    }
+  }
 
   // Persons: "2 adults" / "3 people" / "4 travelers"
-  const p = all.match(/(\d+)\s*(adults?|people|persons?|travellers?|travelers?)/i);
+  const p = all.match(/(\d+)\s*(adults?|people|persons?|travellers?|travelers?|orang)/i);
   const persons = p ? `${p[1]} ${p[2]}` : '1 person';
 
   // Destination: coba dari H1 title dulu, kalau tidak ada, tebak dari kata kunci

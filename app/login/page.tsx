@@ -265,7 +265,7 @@ useEffect(() => {
               <LogoIcon width={40} height={40} color="white" />
               <h1 className="ml-3 text-3xl font-bold flex items-baseline">
                 VELUTARA
-                <span className="ml-4 text-3xl font-bold text-neutral-300">2.0</span>
+                <span className="ml-4 text-3xl font-bold text-neutral-300">3.0</span>
               </h1>
             </div>
             <h2 className="text-3xl font-bold mb-6">Your AI Travel Companion</h2>

@@ -153,7 +153,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
             <Image src={"/android-chrome-512x512.png"} width={240} height={240} alt="logo" />
           </div>
           <Link href={"/dashboard"}>
-            <Typography variant="h1" className="text-xl font-bold">VELUTARA <span className="text-xl font-bold text-neutral-300">2.0</span></Typography>
+            <Typography variant="h1" className="text-xl font-bold">VELUTARA <span className="text-xl font-bold text-neutral-300">3.0</span></Typography>
           </Link>
           <button className="ml-auto text-gray-500 hover:text-gray-700 lg:hidden" onClick={() => setSidebarOpen(false)}>
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
