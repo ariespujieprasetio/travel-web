@@ -2,11 +2,12 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { roboto_mono } from "./fonts";
 
-
-
 export const metadata: Metadata = {
   title: "VELUTARA",
   description: "",
+  icons: {
+    icon: "/icon.svg",
+  },
 };
 
 export default function RootLayout({
@@ -16,12 +17,26 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${roboto_mono.className} antialiased row`}
-      >
-          <main className="w-full  bg-gray-100 min-h-full">
-            {children}
-          </main>
+      <head>
+        {/* Travelpayouts verification script */}
+        <script
+          data-noptimize="1"
+          data-cfasync="false"
+          data-wpfc-render="false"
+          dangerouslySetInnerHTML={{
+            __html: `(function () {
+              var script = document.createElement("script");
+              script.async = 1;
+              script.src = 'https://emrld.ltd/NDU4NzE5.js?t=458719';
+              document.head.appendChild(script);
+            })();`,
+          }}
+        />
+      </head>
+      <body className={`${roboto_mono.className} antialiased row`}>
+        <main className="w-full bg-gray-100 min-h-full">
+          {children}
+        </main>
       </body>
     </html>
   );

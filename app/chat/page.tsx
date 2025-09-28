@@ -12,6 +12,7 @@ import {
 } from "@/src/utils/chatUtils";
 import ChatMessageComponent from "@/src/components/ChatMessage";
 import FileUploadButton from "@/src/components/FileUploadButton";
+import { exportModeledItineraryToPDF } from "@/src/services/exportService";
 
 export default function ChatPage() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -358,7 +359,7 @@ export default function ChatPage() {
               </h3>
             </div>
             <div className="mt-1 p-3 sm:p-4 rounded-lg bg-white text-gray-700 shadow-sm">
-              <Markdown 
+              <Markdown  
                 components={{
                   table: ({ ...props }) => (
                     <div className="overflow-x-auto">
@@ -369,7 +370,7 @@ export default function ChatPage() {
                     <thead className="bg-gray-100" {...props} />
                   ),
                   tbody: ({ ...props }) => (
-                    <tbody className="bg-white" {...props} />
+                    <tbody className="bg-indigo-100" {...props} />
                   ),
                   th: ({ ...props }) => (
                     <th className="px-2 sm:px-4 py-2 border border-gray-200 text-left text-xs sm:text-sm font-medium text-gray-700" {...props} />
@@ -542,6 +543,32 @@ export default function ChatPage() {
               )}
             </button>
           </div>
+        </div>
+      </div>
+
+      
+      <div className="hidden lg:flex justify-between p-4 text-lg font-bold shadow-sm bg-white">
+        <div>
+          <header>{sessionTitle}</header>
+          {sessionTagline && <p className="text-sm font-normal text-gray-500">{sessionTagline}</p>}
+        </div>
+
+        <div className="flex items-center gap-2">
+          <span className="text-sm bg-green-100 text-green-600 px-2 py-1 rounded-full">Connected</span>
+
+          {/* Export Modeled Itinerary (sesuai sys-new.txt) */}
+          <button
+            onClick={() =>
+              exportModeledItineraryToPDF(
+                // kirim raw messages; parser akan ambil pesan bot terbaru yg berisi itinerary modeled
+                messages.map(m => ({ sender: m.sender, text: m.text })),
+                `velutara-itinerary-${sessionManager.getCurrentSessionId()}.pdf`,
+              )
+            }
+            className="px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded text-sm"
+          >
+            Export Itinerary (PDF)
+          </button>
         </div>
       </div>
     </div>

@@ -1,3 +1,5 @@
+//login/page.tsx 
+
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
@@ -8,6 +10,8 @@ import LogoIcon from '@/src/LogoIcon'
 import useAuth from '@/src/hooks/useAuth'
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/src/store/authStore"
+
 
 const testimonials = [
   {
@@ -45,6 +49,41 @@ const testimonials = [
     review:
       "I love the simple interface and the weather forecast is very accurate. My trip to Bali went so smoothly thanks to Velutara!",
   },
+  {
+    initials: "TS",
+    name: "Tommy Sanders",
+    rating: 4,
+    review:
+      "Velutara helped me plan my Europe backpacking trip faster than any other tool I’ve tried. Some suggestions could be more budget-focused, but overall great!",
+  },
+  {
+    initials: "LS",
+    name: "Lena Schmidt",
+    rating: 5,
+    review:
+      "A lifesaver! I had less than a week to plan a trip to Seoul, and Velutara gave me a full itinerary, including transit maps and food recs.",
+  },
+  {
+    initials: "BR",
+    name: "Brian Richards",
+    rating: 4,
+    review:
+      "Very convenient! Though I wish it had more offline features, Velutara still helped me enjoy every bit of my Thailand trip.",
+  },
+  {
+    initials: "NL",
+    name: "Nadia Lopez",
+    rating: 5,
+    review:
+      "From booking to arrival, Velutara had everything covered. Even local phrases were suggested to help me get around!",
+  },
+  {
+    initials: "HS",
+    name: "Haruto Sato",
+    rating: 5,
+    review:
+      "Perfect for travelers like me who prefer to avoid tourist traps. I found peaceful temples and authentic eateries thanks to Velutara.",
+  },
 ];
 
 export default function LoginPage() {
@@ -55,60 +94,100 @@ export default function LoginPage() {
   const [name, setName] = useState('')
   const [rememberMe, setRememberMe] = useState(false)
   const [passwordVisible, setPasswordVisible] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(false) // New state for auth check
+const [mounted, setMounted] = useState(false);
 
-  const { login, signup, isLoading, error, clearError } = useAuth({
-    redirectIfAuthenticated: '/dashboard' // Redirect to dashboard if already logged in
-  })
-
-  // Check URL for signup parameter
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const urlParams = new URLSearchParams(window.location.search)
-      if (urlParams.get('signup') === 'true') {
-        setIsLogin(false)
-      }
-    }
-  }, [])
-
-  // Clear errors when switching between login/signup
-  useEffect(() => {
-    clearError()
-  }, [isLogin, clearError])
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    if (isLogin) {
-      const success = await login(email, password, rememberMe);
-      if (success) {
-        window.location.replace('/dashboard');
-      }
-    } else {
-      const success = await signup(email, password, rememberMe, name,);
-      if (success) {
-        window.location.replace('/dashboard');
-      }
-    }
-  };
-  const togglePasswordVisibility = (): void => {
-    setPasswordVisible(!passwordVisible)
-  }
+  const [gapi, setGapi] = useState<any>(null);
 
   const router = useRouter();
 
-  // Ambil token dari URL setelah login
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get("token");
-    if (token) {
-      localStorage.setItem("authToken", token); // Simpan token
-      router.push("/dashboard"); // Arahkan ke halaman dashboard
-    }
-  }, []);
+    const { token, user, isLoading, error, clearError, login, signup, loginRegisterWithGoogle } = useAuthStore();
 
-  const handleGoogleAuth = () => {
-    window.location.href = "https://velutara.com/auth/google/callback";
+  useEffect(() => setMounted(true), []);
+
+  useEffect(() => {
+    clearError();
+  }, [mounted, clearError]);
+
+  useEffect(() => {
+    if (mounted && token && user) {
+      router.push('/dashboard');
+    }
+  }, [mounted, token, user, router]);
+
+  const googleBtnRef = useRef<HTMLDivElement>(null);
+
+const renderGoogleButton = () => {
+  if (typeof window === 'undefined') return;
+  if (!window.google || !googleBtnRef.current) return;
+
+  googleBtnRef.current.innerHTML = '';
+
+  window.google.accounts.id.initialize({
+    client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,
+    callback: async (res) => {
+      console.log("Google Credential: ", res.credential);
+      const ok = await loginRegisterWithGoogle(res.credential);
+      if (ok) router.push('/dashboard');
+    },
+  });
+
+  window.google.accounts.id.renderButton(googleBtnRef.current, {
+    theme: 'outline',
+    size: 'large',
+    locale: "en",
+    width: 'fill',
+    text: 'continue_with',
+  });
+};
+
+
+
+useEffect(() => {
+  if (!mounted) return;
+
+  const timeout = setTimeout(() => {
+    renderGoogleButton();
+  }, 100);
+
+  const handleVisibilityChange = () => {
+    if (document.visibilityState === 'visible') {
+      renderGoogleButton();
+    }
   };
+
+  document.addEventListener('visibilitychange', handleVisibilityChange);
+
+  return () => {
+    clearTimeout(timeout);
+    document.removeEventListener('visibilitychange', handleVisibilityChange);
+  };
+}, [mounted, loginRegisterWithGoogle, router, isLogin]);
+
+  useEffect(() => {
+    clearError()
+  }, [isLogin, clearError]);
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+
+      if (isLogin) {
+        const success = await login(email, password, rememberMe);
+        if (success) {
+          router.push("/dashboard");
+        }
+      } else {
+        const success = await signup(email, password, rememberMe, name,);
+        if (success) {
+          router.push("/dashboard");
+        }
+      }
+    };
+
+
+  const togglePasswordVisibility = (): void => {
+    setPasswordVisible(!passwordVisible)
+  }
 
 
   // create slider testimonials
@@ -184,7 +263,10 @@ export default function LoginPage() {
           >
             <div className="mb-6 flex items-center">
               <LogoIcon width={40} height={40} color="white" />
-              <h1 className="ml-3 text-3xl font-bold">VELUTARA</h1>
+              <h1 className="ml-3 text-3xl font-bold flex items-baseline">
+                VELUTARA
+                <span className="ml-4 text-3xl font-bold text-neutral-300">3.0</span>
+              </h1>
             </div>
             <h2 className="text-3xl font-bold mb-6">Your AI Travel Companion</h2>
             <p className="text-purple-100 text-lg mb-8">
@@ -474,35 +556,10 @@ export default function LoginPage() {
                     <div className="w-full border-t border-gray-300" />
                   </div>
                   <div className="relative flex justify-center text-sm">
-                    <span className="bg-white px-2 text-gray-500">or continue with</span>
+                    <span className="bg-white px-2 text-gray-500">or</span>
                   </div>
                 </div>
-
-                <button
-                  type="button"
-                  onClick={handleGoogleAuth}
-                  className="mt-6 w-full inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm bg-white hover:bg-gray-50 transition duration-150"
-                >
-                  <svg className="h-5 w-5 mr-2" viewBox="0 0 48 48">
-                    <path
-                      fill="#EA4335"
-                      d="M24 9.5c3.1 0 5.6 1.1 7.4 2.8l5.5-5.5C33.6 3.4 29.2 1.5 24 1.5 14.6 1.5 6.8 7.9 3.6 16.3l6.8 5.3C12.5 14.4 17.7 9.5 24 9.5z"
-                    />
-                    <path
-                      fill="#34A853"
-                      d="M46.1 24.5c0-1.6-.1-2.7-.4-4H24v7.5h12.5c-.6 3-2.4 5.5-5.1 7.2v5.9h8.2c4.8-4.4 6.9-10.9 6.9-16.6z"
-                    />
-                    <path
-                      fill="#4A90E2"
-                      d="M10.4 28.6C9.7 26.8 9.3 24.9 9.3 23s.4-3.8 1.1-5.6l-6.8-5.3C1.9 15.4 0 19.5 0 24s1.9 8.6 5.1 11.9l6.8-5.3z"
-                    />
-                    <path
-                      fill="#FBBC05"
-                      d="M24 46.5c5.2 0 9.6-1.7 12.8-4.7l-8.2-5.9c-1.5 1-3.5 1.6-5.8 1.6-6.3 0-11.5-4.9-12.5-11.2l-6.8 5.3C6.8 40.1 14.6 46.5 24 46.5z"
-                    />
-                  </svg>
-                  <span>{isLogin ? 'Sign in with Google' : 'Sign up with Google'}</span>
-                </button>
+                <div ref={googleBtnRef} className="mt-6 full" />
               </form>
             </motion.div>
           </AnimatePresence>

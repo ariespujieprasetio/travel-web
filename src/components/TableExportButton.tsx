@@ -83,7 +83,7 @@ export default function TableExportButton({
       ref={containerRef}
     >
       {/* Main button */}
-      <button
+      {/* <button
         onClick={() => setIsExpanded(!isExpanded)}
         className={`flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:shadow-md transition-all ${className} ${isExporting ? 'opacity-80 cursor-not-allowed' : ''}`}
         disabled={isExporting}
@@ -102,7 +102,7 @@ export default function TableExportButton({
         ) : (
           <span>Export Table</span>
         )}
-      </button>
+      </button> */}
       
       {/* Expanded format buttons */}
       {isExpanded && !isExporting && (

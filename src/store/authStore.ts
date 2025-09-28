@@ -12,11 +12,13 @@ interface AuthState {
     error: string | null;
     login: (email: string, password: string, rememberMe: boolean) => Promise<boolean>;
     signup: (email: string, password: string, rememberMe: boolean, name?: string) => Promise<boolean>;
+    loginRegisterWithGoogle: (idToken: string) => Promise<boolean>; 
     logout: () => void;
     isAuthenticated: () => boolean;
     clearError: () => void;
     updateUser: (user: User) => void;
     getProfile: () => Promise<User | null>;
+    setToken: (token: string) => void; 
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -28,6 +30,10 @@ export const useAuthStore = create<AuthState>()(
             error: null,
             isAuthenticated: () => !!get().token,
 
+            setToken: (token: string) => {
+                set({ token });
+            },
+            
             login: async (email: string, password: string, rememberMe: boolean = false) => {
                 try {
                     set({ isLoading: true, error: null });
@@ -98,6 +104,42 @@ export const useAuthStore = create<AuthState>()(
                     });
                     return false;
                 }
+            },
+
+            loginRegisterWithGoogle: async (idToken: string): Promise<boolean> => {
+            try {
+                set({ isLoading: true, error: null });
+
+                const response = await fetch(`${API_URL}/api/auth/google/callback`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ idToken }),
+                });
+
+                if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Google login failed');
+                }
+
+                const data = await response.json();
+
+                set({
+                token: data.token,
+                user: data.user,
+                isLoading: false,
+                });
+
+                return true;
+            } catch (error) {
+                const errorMessage = error instanceof Error ? error.message : 'Google login failed';
+                set({
+                isLoading: false,
+                error: errorMessage,
+                });
+                return false;
+            }
             },
 
             logout: () => {
