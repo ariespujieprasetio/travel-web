@@ -530,6 +530,9 @@ export function exportModeledItineraryToPDF(
     let total = 0;
     const dayTotals: Record<string, number> = {};
 
+    // --- default currency ---
+    let currencySymbol = "$";
+
     if (parsed.itineraryTable) {
       const priceCol = parsed.itineraryTable.headers.findIndex(h =>
         h.toLowerCase().includes("price")
@@ -540,7 +543,16 @@ export function exportModeledItineraryToPDF(
 
       parsed.itineraryTable.rows.forEach(row => {
         if (priceCol >= 0 && row[priceCol]) {
-          const price = parsePrice(row[priceCol]);
+          const val = row[priceCol].toString();
+
+          // 🔎 deteksi currency dari value
+          if (/rp/i.test(val) || /idr/i.test(val)) {
+            currencySymbol = "Rp";
+          } else if (/\$|usd/i.test(val)) {
+            currencySymbol = "$";
+          }
+
+          const price = parsePrice(val);
           total += price;
 
           let dayLabel = dayCol >= 0 && row[dayCol] ? row[dayCol].toString().trim() : "";
@@ -553,9 +565,20 @@ export function exportModeledItineraryToPDF(
       });
     }
 
+    // --- ambil jumlah hari ---
     const numDays = Object.keys(dayTotals).filter(d => /^day\s*\d+/i.test(d)).length || 1;
-    const totalStr = `$${total.toLocaleString()}`;
-    const avgStr = `$${Math.round(total / numDays).toLocaleString()}`;
+
+    // --- ambil jumlah person dari meta.persons ---
+    let numPersons = 1;
+    const pMatch = meta.persons.match(/(\d+)/);
+    if (pMatch) {
+      numPersons = parseInt(pMatch[1], 10);
+    }
+
+    // --- hitung string untuk PDF ---
+    const totalWithPersons = total * numPersons;
+    const totalStr = `${currencySymbol}${totalWithPersons.toLocaleString()}`;
+    const avgStr = `${currencySymbol}${Math.round(totalWithPersons / numDays / numPersons).toLocaleString()}`;
 
     // Buat tabel breakdown
     const finalBudget: string[][] = [
@@ -569,7 +592,7 @@ export function exportModeledItineraryToPDF(
 
     Object.keys(dayTotals).forEach(day => {
       if (/^day\s*\d+/i.test(day)) {
-        finalBudget.push([day, ":", `$${dayTotals[day].toLocaleString()}`]);
+        finalBudget.push([day, ":", `${currencySymbol}${dayTotals[day].toLocaleString()}`]);
       }
     });
 
@@ -588,7 +611,7 @@ export function exportModeledItineraryToPDF(
       startY: 30,
       theme: "grid",
       styles: { fontSize: 11, cellPadding: 4 },
-      headStyles: { fillColor: [153, 51, 255], textColor: 255 }, // senada
+      headStyles: { fillColor: [153, 51, 255], textColor: 255 },
       columnStyles: {
         0: { fontStyle: "bold", halign: "left" },
         1: { halign: "center", cellWidth: 5 },
