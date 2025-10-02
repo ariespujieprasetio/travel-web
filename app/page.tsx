@@ -79,42 +79,42 @@ export default function LandingPage() {
   const destinations = [
     {
       name: "Bangkok, Thailand",
-      url: "https://en.wikipedia.org/wiki/Bangkok",
+      url: "https://www.tripadvisor.com/Tourism-g293916-Bangkok-Vacations.html",
       img: "https://images.unsplash.com/photo-1563492065599-3520f775eeed?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8YmFuZ2tva3xlbnwwfHwwfHx8MA%3D%3D",
     },
     {
       name: "Dubai, UAE",
-      url: "https://en.wikipedia.org/wiki/Dubai",
+      url: "https://www.tripadvisor.com/Tourism-g295424-Dubai_Emirate_of_Dubai-Vacations.html",
       img: "https://plus.unsplash.com/premium_photo-1697729914552-368899dc4757?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8YnVyaiUyMGtoYWxpZmF8ZW58MHx8MHx8fDA%3D",
     },
     {
       name: "Jakarta, Indonesia",
-      url: "https://en.wikipedia.org/wiki/Jakarta",
+      url: "https://www.tripadvisor.com/Tourism-g294229-Jakarta_Java-Vacations.html",
       img: "https://images.unsplash.com/photo-1662808782878-941ea16adbdc?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8bW9uYXN8ZW58MHx8MHx8fDA%3D",
     },
     {
       name: "Kuala Lumpur, Malaysia",
-      url: "https://en.wikipedia.org/wiki/Kuala_Lumpur",
+      url: "https://www.tripadvisor.com/Tourism-g298570-Kuala_Lumpur_Wilayah_Persekutuan-Vacations.html",
       img: "https://images.unsplash.com/photo-1596422846543-75c6fc197f07?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8a3VhbGElMjBsdW1wdXJ8ZW58MHx8MHx8fDA%3D",
     },
     {
       name: "Manila, Philippines",
-      url: "https://en.wikipedia.org/wiki/Manila",
+      url: "https://www.tripadvisor.com/Tourism-g298573-Manila_Metro_Manila_Luzon-Vacations.html",
       img: "https://images.unsplash.com/photo-1655016268120-383558788b37?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8bWFuaWxhJTIwZmlsaXBpbmF8ZW58MHx8MHx8fDA%3D",
     },
     {
       name: "Seoul, South Korea",
-      url: "https://en.wikipedia.org/wiki/Seoul",
+      url: "https://www.tripadvisor.com/Tourism-g294197-Seoul-Vacations.html",
       img: "https://plus.unsplash.com/premium_photo-1661886333708-877148b43ae1?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8c2VvdWx8ZW58MHx8MHx8fDA%3D",
     },
     {
       name: "Singapore",
-      url: "https://en.wikipedia.org/wiki/Singapore",
+      url: "https://www.tripadvisor.com/Tourism-g294265-Singapore-Vacations.html",
       img: "https://images.unsplash.com/photo-1697438167040-ccfd469c40f2?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     },
     {
       name: "Tokyo, Japan",
-      url: "https://en.wikipedia.org/wiki/Tokyo",
+      url: "https://www.tripadvisor.com/Tourism-g298184-Tokyo_Tokyo_Prefecture_Kanto-Vacations.html",
       img: "https://images.unsplash.com/photo-1513407030348-c983a97b98d8?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8dG9reW98ZW58MHx8MHx8fDA%3D",
     },
   ];
