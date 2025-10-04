@@ -293,30 +293,42 @@ function clean(txt: string): string {
 function parseModeledItinerary(md: string): ParsedItinerary {
   const out: ParsedItinerary = {};
 
+  // === DEBUG RAW ===
+  // console.log("=== RAW MARKDOWN START ===");
+  // console.log(md);
+  // console.log("=== RAW MARKDOWN END ===");
+
   // Title H1
   const titleMatch = md.match(/^\s*#\s+(.+)\s*$/m);
-  if (titleMatch) out.title = titleMatch[1].trim();
+  if (titleMatch) {
+    out.title = titleMatch[1].trim();
+    // console.log("✔ Title found:", out.title);
+  }
 
-  // Key-Value lines (support bold **Key**, normal Key, dash, colon)
+  // Key-Value lines
   const kvRegex = /^\s*(?:\*\*)?(.+?)(?:\*\*)?\s*[:\-]\s*(.+)\s*$/gm;
   let m: RegExpExecArray | null;
   while ((m = kvRegex.exec(md)) !== null) {
     const key = m[1].trim().toLowerCase();
     const val = m[2].trim();
+    // console.log("KV pair:", key, "=>", val);
     if (key.includes("accommodation")) out.accommodation = val;
     else if (key.includes("transport") || key.includes("transportation")) out.transportType = val;
     else if (key.includes("daily budget") || key.includes("budget per day")) out.dailyBudget = val;
   }
 
-
   // Extract tables
   const tables = extractTablesFromMarkdown(md);
+  // console.log("Tables found:", tables.length);
   if (tables.length > 0) out.itineraryTable = tables[0];
   if (tables.length > 1) out.transportTable = tables[1];
 
   // Transport docs heading
   const transTitle = md.match(/^\s*##\s+Transportation Logistics Documentation\s*$/mi);
-  if (transTitle) out.transportDocTitle = "Transportation Logistics Documentation";
+  if (transTitle) {
+    out.transportDocTitle = "Transportation Logistics Documentation";
+    // console.log("✔ Transport doc heading found");
+  }
 
   // Budget summary block
   const budgetBlock = md.match(
@@ -325,6 +337,7 @@ function parseModeledItinerary(md: string): ParsedItinerary {
   if (budgetBlock) {
     out.budgetSummaryTitle = "BUDGET SUMMARY";
     const block = budgetBlock[0];
+    // console.log("✔ Budget block found:", block);
     const lineRegex = /(?:\*\*(.+?)\*\*\s*:|\*\*?(.+?)\*\*?\s*:|\-\s*(.+?):)\s*(.+)$/gm;
     const lines: Array<{ label: string; value: string }> = [];
     let lm: RegExpExecArray | null;
@@ -333,29 +346,59 @@ function parseModeledItinerary(md: string): ParsedItinerary {
       const value = (lm[4] || "").trim();
       if (label && value) {
         lines.push({ label, value });
+        console.log("Budget line:", label, "=>", value);
       }
     }
     out.budgetLines = lines;
   }
 
-  // 🔹 Contextual info parsing
-  const getBlock = (labels: string[]): string | undefined => {
-    const joined = labels.join("|");
-    const regex = new RegExp(
-      `(?:${joined})[^:]*:\\s*([\\s\\S]*?)(?=\\n\\s*(?:National holidays|Major local events|Typical weather forecast|Latest news update)[^:]*:|\\n\\n|$)`,
-      "i"
-    );
-    const m = md.match(regex);
-    return m ? clean(m[1]) : undefined;  // 🔹 apply clean sebelum return
-  };
+  // === Contextual info parsing ===
+  const lines = md.split("\n").map(l => l.trim()).filter(Boolean);
 
-  out.nationalDay = getBlock(["National holidays", "National holidays during your dates"]);
-  out.majorEvent = getBlock(["Major local events", "Major local events/festivals"]);
-  out.weather = getBlock(["Typical weather forecast", "Typical weather forecast for those dates"]);
-  out.news = getBlock(["Latest news update", "Latest news update for your destination"]);
+  for (const line of lines) {
+    // National Holidays
+    if (/^(?:\d+\.\s*)?\*?\*?National Holidays/i.test(line)) {
+      out.nationalDay = line.replace(/^(?:\d+\.\s*)?\*?\*?National Holidays[^:]*:\s*/i, "").trim();
+      // console.log("✔ NationalDay MATCH:", out.nationalDay);
+    } 
+    // Major Events
+    else if (/^(?:\d+\.\s*)?\*?\*?Major (Local )?Events/i.test(line)) {
+      out.majorEvent = line.replace(/^(?:\d+\.\s*)?\*?\*?Major (Local )?Events[^:]*:\s*/i, "").trim();
+      // console.log("✔ MajorEvent MATCH:", out.majorEvent);
+    } 
+    // Weather
+    else if (/^(?:\d+\.\s*)?\*?\*?Typical Weather Forecast/i.test(line)) {
+      out.weather = line.replace(/^(?:\d+\.\s*)?\*?\*?Typical Weather Forecast[^:]*:\s*/i, "").trim();
+      // console.log("✔ Weather MATCH:", out.weather);
+    } 
+    // News
+    else if (/^(?:\d+\.\s*)?\*?\*?Latest News Update/i.test(line)) {
+      out.news = line.replace(/^(?:\d+\.\s*)?\*?\*?Latest News Update[^:]*:\s*/i, "").trim();
+      // console.log("✔ News MATCH:", out.news);
+    }
+  }
+
+  // Fallback supaya ga kosong
+  if (!out.majorEvent) {
+    // console.log("⚠ MajorEvent NOT FOUND");
+    out.majorEvent = "Not specified";
+  }
+  if (!out.nationalDay) {
+    // console.log("⚠ NationalDay NOT FOUND");
+    out.nationalDay = "Not specified";
+  }
+  if (!out.weather) {
+    // console.log("⚠ Weather NOT FOUND");
+    out.weather = "Not specified";
+  }
+  if (!out.news) {
+    // console.log("⚠ News NOT FOUND");
+    out.news = "Not specified";
+  }
 
   return out;
 }
+
 
 
 
