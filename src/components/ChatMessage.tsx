@@ -11,7 +11,7 @@ import { sessionManager } from '../services/sessionService'
 
 interface ChatMessageProps {
   message: {
-    sender: 'user' | 'bot'
+    sender: "user" | "bot" | "bot-loading";
     text: string
   }
 }

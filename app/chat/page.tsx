@@ -108,39 +108,71 @@ export default function ChatPage() {
   }, [messages.length]); // Re-establish when messages change or session changes
   
   // Set up message listener for the active session
-  useEffect(() => {
-    // Only setup listener when we have an active session
-    if (sessionManager.getCurrentSessionId()) {
-      const cleanup = sessionManager.setupMessageListener(
-        // Handle message chunk
-        (msg: string) => {
-          // Append to current message
-          setCurrentBotMessage(prev => prev + msg);
-          
-          // Scroll to bottom
-          if (containerRef.current) {
-            containerRef.current.scrollTo({
-              top: containerRef.current.scrollHeight,
-              behavior: 'smooth'
-            });
+  // ⭐ STREAM + LOADING BUBBLE HANDLER
+useEffect(() => {
+  if (!sessionManager.getCurrentSessionId()) return;
+
+  return sessionManager.setupMessageListener(
+
+    // CHUNK
+    (msg: string) => {
+
+      // 🟣 Loading bubble dari backend
+      if (msg.startsWith("__LOADING__")) {
+        const loadingText = msg.replace("__LOADING__", "").trim();
+
+        setMessages(prev => {
+          const last = prev[prev.length - 1];
+
+          // Update bubble loading terakhir
+          if (last?.sender === "bot-loading") {
+            return [
+              ...prev.slice(0, -1),
+              { sender: "bot-loading", text: loadingText }
+            ];
           }
-        },
-        // Handle message complete
-        () => {
-          // Add complete message to list and clear current
-          setCurrentBotMessage(prevMsg => {
-            if (prevMsg.trim() !== "") {
-              setMessages(prev => [...prev, { sender: "bot", text: prevMsg }]);
+
+          // Buat bubble loading baru
+          return [...prev, { sender: "bot-loading", text: loadingText }];
+        });
+
+        return; // stop supaya ga masuk ke streaming normal
+      }
+
+      // ⚪ Normal streaming jawaban AI
+      setCurrentBotMessage(prev => prev + msg);
+
+      if (containerRef.current) {
+        containerRef.current.scrollTo({
+          top: containerRef.current.scrollHeight,
+          behavior: "smooth"
+        });
+      }
+    },
+
+    // COMPLETE (jawaban final selesai)
+    () => {
+      setCurrentBotMessage(prevMsg => {
+        if (prevMsg.trim() !== "") {
+          setMessages(prev => {
+            const last = prev[prev.length - 1];
+
+            // Replace loading bubble → jawaban final
+            if (last?.sender === "bot-loading") {
+              return [
+                ...prev.slice(0, -1),
+                { sender: "bot", text: prevMsg }
+              ];
             }
-            return "";
+
+            return [...prev, { sender: "bot", text: prevMsg }];
           });
         }
-      );
-      
-      // Return cleanup function
-      return cleanup;
+        return "";
+      });
     }
-  }, [messages.length]); // Re-establish listener when messages change
+  );
+}, [messages.length]);
   
   // Handle session switching from external sources
   useEffect(() => {
@@ -343,9 +375,11 @@ export default function ChatPage() {
         className="flex-grow flex flex-col gap-3 p-4 overflow-y-auto bg-gray-50"
         style={{ height: 'calc(100vh - 180px)' }}
       >
-        {messages.map((msg, i) => (
-          <ChatMessageComponent key={i} message={msg} />
-        ))}
+        {messages
+          .filter((msg) => msg.sender !== "bot-loading")
+          .map((msg, i) => (
+            <ChatMessageComponent key={i} message={msg} />
+          ))}
         
         {currentBotMessage && (
           <div className="max-w-full sm:max-w-[85%] md:max-w-3xl mr-auto">

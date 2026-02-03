@@ -5,7 +5,7 @@
  * Represents a chat message
  */
 export type ChatMessage = {
-  sender: "user" | "bot";
+  sender: "user" | "bot" | "bot-loading";
   text: string;
 };
 export interface ApiMessage {
