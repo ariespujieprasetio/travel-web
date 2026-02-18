@@ -12,7 +12,8 @@ import {
 } from "@/src/utils/chatUtils";
 import ChatMessageComponent from "@/src/components/ChatMessage";
 import FileUploadButton from "@/src/components/FileUploadButton";
-import { exportModeledItineraryToPDF } from "@/src/services/exportService";
+// import { exportModeledItineraryToPDF } from "@/src/services/exportService";
+import { downloadBackendPDF } from "@/src/services/exportService";
 
 export default function ChatPage() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -593,10 +594,8 @@ useEffect(() => {
           {/* Export Modeled Itinerary (sesuai sys-new.txt) */}
           <button
             onClick={() =>
-              exportModeledItineraryToPDF(
-                messages.map(m => ({ sender: m.sender, text: m.text })), // messages
-                sessionManager.getCurrentSessionId(),                    // ✅ sessionId asli
-                `velutara-itinerary-${sessionManager.getCurrentSessionId()}.pdf` // filename
+              downloadBackendPDF(
+                sessionManager.getCurrentSessionId()
               )
             }
             className="px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded text-sm"
