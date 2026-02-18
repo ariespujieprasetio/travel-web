@@ -594,9 +594,9 @@ useEffect(() => {
           <button
             onClick={() =>
               exportModeledItineraryToPDF(
-                // kirim raw messages; parser akan ambil pesan bot terbaru yg berisi itinerary modeled
-                messages.map(m => ({ sender: m.sender, text: m.text })),
-                `velutara-itinerary-${sessionManager.getCurrentSessionId()}.pdf`,
+                messages.map(m => ({ sender: m.sender, text: m.text })), // messages
+                sessionManager.getCurrentSessionId(),                    // ✅ sessionId asli
+                `velutara-itinerary-${sessionManager.getCurrentSessionId()}.pdf` // filename
               )
             }
             className="px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded text-sm"
