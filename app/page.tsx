@@ -590,7 +590,7 @@ export default function LandingPage() {
           </div>
 
           <div className="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
-            <p className="text-gray-400">© 2025 Velutara. All rights reserved.</p>
+            <p className="text-gray-400">© 2026 Velutara. All rights reserved.</p>
           </div>
         </div>
       </footer>

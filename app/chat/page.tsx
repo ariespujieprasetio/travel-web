@@ -46,6 +46,29 @@ export default function ChatPage() {
     "Suggest a 7-day Cairo historical journey",
     "Suggest a 5-day Singapore innovation tour"
   ];
+
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const autoResize = () => {
+    const el = textareaRef.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = el.scrollHeight + "px";
+  };
+
+  const [itineraryReady, setItineraryReady] = useState(false);
+
+  useEffect(() => {
+    const lastBot = messages
+      .filter(m => m.sender === "bot")
+      .pop();
+  
+    if (!lastBot) return;
+  
+    if (lastBot.text.includes("<itinerary_table>")) {
+      setItineraryReady(true);
+    }
+  }, [messages]);
   
   
   // Handle authentication and initialization
@@ -199,6 +222,10 @@ useEffect(() => {
         await sessionManager.switchSession(sessionId, (loadedMessages) => {
           setMessages(loadedMessages);
           setCurrentBotMessage("");
+        
+          setItineraryReady(
+            loadedMessages.some(m => m.text.includes("<itinerary_table>"))
+          );
         });
         setLoading(false);
       } catch (err) {
@@ -226,6 +253,9 @@ useEffect(() => {
       
       // Clear input
       setInput("");
+      if (textareaRef.current) {
+        textareaRef.current.style.height = "auto";
+      }
       
       // Hide prompts after sending
       setShowPrompts(false);
@@ -304,6 +334,7 @@ useEffect(() => {
       // Clear messages
       setMessages([]);
       setCurrentBotMessage("");
+      setItineraryReady(false);
       // Reset title and tagline for new chat
       setSessionTitle("Travel Assistant");
       setSessionTagline("");
@@ -373,8 +404,7 @@ useEffect(() => {
       {/* Chat Messages */}
       <div
         ref={containerRef}
-        className="flex-grow flex flex-col gap-3 p-4 overflow-y-auto bg-gray-50"
-        style={{ height: 'calc(100vh - 180px)' }}
+        className="flex-grow flex flex-col gap-3 p-4 overflow-y-auto bg-gradient-to-b from-indigo-50 to-white"
       >
         {messages
           .filter((msg) => msg.sender !== "bot-loading")
@@ -393,7 +423,16 @@ useEffect(() => {
                 <span className="ml-2 font-normal text-xs sm:text-sm text-gray-500">typing...</span>
               </h3>
             </div>
-            <div className="mt-1 p-3 sm:p-4 rounded-lg bg-white text-gray-700 shadow-sm">
+            <div className="
+                  mt-1 p-4 
+                  rounded-2xl 
+                  bg-gradient-to-br from-white to-indigo-50
+                  border border-indigo-100
+                  shadow-md
+                  backdrop-blur-sm
+                  text-gray-800
+                  transition
+                  ">
               <Markdown  
                 components={{
                   table: ({ ...props }) => (
@@ -548,12 +587,16 @@ useEffect(() => {
               </div>
             )}
             
-            <input
-              type="text"
+            <textarea
+              ref={textareaRef}
+              rows={1}
               placeholder="Ask about travel destinations..."
-              className="flex-1 p-2 outline-none text-sm sm:text-base"
+              className="flex-1 resize-none p-2 outline-none text-sm sm:text-base max-h-40"
               value={input}
-              onChange={(e) => setInput(e.target.value)}
+              onChange={(e) => {
+                setInput(e.target.value);
+                autoResize();
+              }}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();
@@ -581,29 +624,32 @@ useEffect(() => {
         </div>
       </div>
 
-      
-      <div className="hidden lg:flex justify-between p-4 text-lg font-bold shadow-sm bg-white">
-        <div>
-          <header>{sessionTitle}</header>
-          {sessionTagline && <p className="text-sm font-normal text-gray-500">{sessionTagline}</p>}
-        </div>
 
-        <div className="flex items-center gap-2">
-          <span className="text-sm bg-green-100 text-green-600 px-2 py-1 rounded-full">Connected</span>
-
-          {/* Export Modeled Itinerary (sesuai sys-new.txt) */}
+      {itineraryReady && (
+        <div className="fixed bottom-24 right-6 z-50">
           <button
             onClick={() =>
               downloadBackendPDF(
                 sessionManager.getCurrentSessionId()
               )
             }
-            className="px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded text-sm"
+            className="
+            flex items-center gap-2
+            px-6 py-3
+            bg-indigo-600
+            hover:bg-indigo-700
+            text-white
+            rounded-full
+            shadow-xl shadow-indigo-300/50
+            transition
+            animate-[fadeInUp_0.4s_ease-out]
+            "
           >
-            Export Itinerary (PDF)
+            📄 Download Itinerary
           </button>
         </div>
-      </div>
+      )}
+
     </div>
   );
 }
