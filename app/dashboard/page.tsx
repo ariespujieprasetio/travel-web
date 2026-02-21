@@ -164,16 +164,39 @@ export default function Dashboard() {
   }
 
   return (
-      <div className="min-h-screen relative overflow-hidden 
-      bg-gradient-to-br from-indigo-50 via-purple-50 to-white">
+        <div className="
+        min-h-screen
+        relative
+        overflow-hidden
+        bg-[#020617]
+        text-white
+        ">
+      <div className="pointer-events-none absolute inset-0 -z-10">
 
-        <div className="pointer-events-none absolute -top-40 -left-40 w-[500px] h-[500px] 
-        bg-purple-300 opacity-20 blur-3xl rounded-full"/>
+      <div className="
+        absolute
+        w-[700px] h-[700px]
+        bg-purple-600/20
+        blur-[200px]
+        top-[-200px] right-[-200px]
+      " />
 
-        <div className="pointer-events-none absolute -bottom-40 -right-40 w-[500px] h-[500px] 
-        bg-indigo-300 opacity-20 blur-3xl rounded-full"/>
+      <div className="
+        absolute
+        w-[600px] h-[600px]
+        bg-indigo-600/20
+        blur-[180px]
+        bottom-[-200px] left-[-200px]
+      " />
+
+      </div>
       {/* Header */}
-      <header className="bg-white/70 backdrop-blur-lg shadow-sm border-b border-white/40">
+      <header className="
+      bg-white/[0.03]
+      backdrop-blur-xl
+      border-b border-white/10
+      shadow-[0_0_40px_rgba(99,102,241,0.15)]
+      ">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-3">
@@ -182,7 +205,9 @@ export default function Dashboard() {
               </div>
               <div>
                 <Typography variant="h1" className="text-xl font-bold">Velutara <span className="text-xl font-bold text-neutral-300">4.0</span></Typography>
-                <Typography variant="body2" className="text-gray-500">Your travel AI assistant</Typography>
+                <Typography
+                        variant="body2"
+                        className="text-white/60">Your travel AI assistant</Typography>
               </div>
             </div>
 
@@ -190,7 +215,7 @@ export default function Dashboard() {
               <div className="flex items-center">
                 <div className="hidden md:flex flex-col items-end mr-3">
                   <Typography className="font-medium">{user.name || user.email}</Typography>
-                  {/* <Typography variant="body2" className="text-gray-500">Premium Account</Typography> */}
+                  {/* <Typography variant="body2" className="text-gray-400">Premium Account</Typography> */}
                 </div>
                 <div className="h-10 w-10 rounded-full bg-purple-600 text-white flex items-center justify-center font-bold">
                   {user?.name ? user.name[0].toUpperCase() : user?.email ? user.email[0].toUpperCase() : 'U'}
@@ -203,9 +228,25 @@ export default function Dashboard() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/40 overflow-hidden">
+      <div className="
+          relative isolate
+          bg-white/[0.04]
+          backdrop-blur-2xl
+          rounded-2xl
+          border border-white/10
+          shadow-[0_0_80px_rgba(99,102,241,0.25)]
+          overflow-hidden
+          before:absolute
+          before:inset-0
+          before:rounded-2xl
+          before:bg-gradient-to-br
+          before:from-purple-500/10
+          before:to-indigo-500/5
+          before:pointer-events-none
+          before:z-0
+        ">
           {/* Dashboard Header */}
-          <div className="p-6 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="relative z-10 p-6 border-b border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center">
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -214,9 +255,18 @@ export default function Dashboard() {
                   </path>
                 </svg>
               </div>
-              <div>
-                <Typography variant="h2" className="text-xl font-bold text-gray-900">Your Chat History</Typography>
-                <Typography variant="body2" className="text-gray-500">Review your conversations with Velutara</Typography>
+              <div className="relative z-20">
+                <Typography
+                  variant="h2"
+                  className="text-xl font-semibold text-white">
+                  Your Chat History
+                </Typography>
+
+                <Typography
+                  variant="body2"
+                  className="text-white/70">
+                  Review your conversations with Velutara
+                </Typography>
               </div>
             </div>
 
@@ -234,7 +284,15 @@ export default function Dashboard() {
           </div>
 
           {/* Search and Filter Section */}
-          <div className="p-6 bg-gray-50 border-b border-gray-100">
+          <div className="
+              relative z-10
+              block w-full pl-10 pr-3 py-2
+              bg-white/10
+              border border-white/20
+              text-white
+              rounded-lg
+              backdrop-blur-xl
+            ">
             <div className="flex flex-col md:flex-row md:items-center gap-4">
               <div className="relative flex-grow">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -269,8 +327,13 @@ export default function Dashboard() {
           </div>
 
           {/* Chat Count */}
-          <div className="px-6 py-3 bg-white border-b border-gray-100">
-            <div className="text-gray-600 text-sm">
+          <div className="
+                px-6 py-3
+                bg-white/[0.02]
+                border-b border-white/10
+                text-gray-400
+                ">
+            <div className="text-gray-400 text-sm">
               {loading ? 'Loading chats...' :
                 `You have ${sessions.length} previous chats with Velutara`}
               {filteredSessions.length > 0 && sessions.length !== filteredSessions.length && (
@@ -303,7 +366,7 @@ export default function Dashboard() {
                     </svg>
                   </div>
                   <h3 className="text-lg font-medium text-gray-900 mb-1">No conversations yet</h3>
-                  <p className="text-gray-500 mb-6">Start your journey with Velutara by beginning a new chat</p>
+                  <p className="text-gray-400 mb-6">Start your journey with Velutara by beginning a new chat</p>
                   <motion.button
                     whileHover={{ scale: 1.03 }}
                     whileTap={{ scale: 0.97 }}
@@ -320,7 +383,7 @@ export default function Dashboard() {
             ) : filteredSessions.length === 0 ? (
               // No results from filtering
               <div className="p-12 text-center">
-                <p className="text-gray-600 mb-4">No chats match your search criteria</p>
+                <p className="text-gray-400 mb-4">No chats match your search criteria</p>
                 <button
                   onClick={() => {
                     setSearchQuery('');
@@ -337,20 +400,33 @@ export default function Dashboard() {
                 {filteredSessions.map((session, index) => {
                   const tag = getSessionTag(session);
                   return (
-                    <motion.div
+                    <motion.div 
                       key={session.id}
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.3, delay: index * 0.05 }}
                       whileHover={{ y: -4, boxShadow: '0 12px 20px -10px rgba(0, 0, 0, 0.1)' }}
                       className="
-                        group relative overflow-hidden
-                        bg-white/80 backdrop-blur
-                        rounded-xl border border-gray-200
-                        hover:border-transparent
-                        hover:shadow-xl
-                        transition-all duration-300
-                        cursor-pointer
+                      group
+                      relative
+                      overflow-hidden
+                      bg-white/[0.03]
+                      backdrop-blur-xl
+                      rounded-xl
+                      border border-white/10
+                      hover:border-purple-500/40
+                      hover:shadow-[0_0_40px_rgba(139,92,246,0.3)]
+                      transition-all duration-500
+                      cursor-pointer
+                      before:absolute
+                      before:inset-0
+                      before:bg-gradient-to-br
+                      before:from-purple-500/0
+                      before:via-purple-500/10
+                      before:to-indigo-500/0
+                      before:opacity-0
+                      hover:before:opacity-100
+                      before:transition
                       "
                       onClick={() => {
                         sessionStorage.setItem('activeSessionId', session.id)
@@ -373,7 +449,7 @@ export default function Dashboard() {
                           opacity-0 group-hover:opacity-100
                           transition
                           text-gray-400 hover:text-red-500
-                          bg-white/70 backdrop-blur
+                        bg-white/10 backdrop-blur-xl
                           rounded-md px-2 py-1
                           shadow
                         "
@@ -383,16 +459,23 @@ export default function Dashboard() {
                       <div className="p-4">
                         <div className="flex justify-between items-start mb-3">
                           <div>
-                            <h3 className="font-semibold text-gray-900 mb-1">
+                          <h3 className="font-semibold text-white mb-1">
                               {session.title || "New Conversation"}
                             </h3>
-                            <div className="text-xs text-gray-500">
+                            <div className="text-xs text-gray-300">
                               {formatDate(session.updatedAt)}
                             </div>
                           </div>
 
-                          <span className="px-2 py-1 bg-gray-100 text-xs font-medium rounded-full text-gray-600">
-                            {tag}
+                          <span className="
+                                px-2 py-1
+                                text-xs font-medium
+                                rounded-full
+                                bg-white/[0.05]
+                                text-white
+                                border border-white/10
+                                ">                            
+                                {tag}
                           </span>
                         </div>
 
@@ -402,7 +485,7 @@ export default function Dashboard() {
                             Memory Saved
                           </div>
 
-                          <p className="text-sm text-gray-600 line-clamp-2">
+                          <p className="text-sm text-gray-300 line-clamp-2">
                             {generatePreviewText(session)}
                           </p>
                         </div>
@@ -418,36 +501,41 @@ export default function Dashboard() {
       </main>
 
       {/* Footer */}
-      <footer className="mt-auto py-6 bg-white border-t border-gray-200">
+      <footer className="
+              mt-auto py-6
+              bg-white/[0.03]
+              backdrop-blur-xl
+              border-t border-white/10
+            ">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row justify-between items-center">
             <div className="mb-4 sm:mb-0">
-              <p className="text-sm text-gray-500">
+            <p className="text-sm text-white/40">
                 © 2026 Velutara. All rights reserved.
               </p>
             </div>
             <div className="flex space-x-6">
               <Link
                 href="/privacy"
-                className="text-sm text-gray-500 hover:text-gray-900"
+                className="text-sm text-white/40 hover:text-white/80 transition"
               >
                 Privacy
               </Link>
               <Link
                 href="/terms"
-                className="text-sm text-gray-500 hover:text-gray-900"
+                className="text-sm text-gray-400 hover:text-gray-900"
               >
                 Terms
               </Link>
               {/* <Link
                 href="/support"
-                className="text-sm text-gray-500 hover:text-gray-900"
+                className="text-sm text-gray-400 hover:text-gray-900"
               >
                 Support
               </Link> */}
               <button
                 onClick={handleLogout}
-                className="text-sm text-gray-500 hover:text-gray-900"
+                className="text-sm text-gray-400 hover:text-gray-900"
               >
                 Log out
               </button>
@@ -459,7 +547,7 @@ export default function Dashboard() {
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
         <div className="bg-white rounded-xl p-6 shadow-xl w-[90%] max-w-sm">
           <h2 className="text-lg font-semibold mb-2">Delete Chat?</h2>
-          <p className="text-sm text-gray-600 mb-4">
+          <p className="text-sm text-gray-400 mb-4">
             Are you sure you want to delete
             <strong> {sessionToDelete.title || 'New Conversation'} </strong>?
           </p>

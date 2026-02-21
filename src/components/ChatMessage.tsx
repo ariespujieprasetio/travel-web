@@ -101,22 +101,25 @@ export default function ChatMessage({ message }: ChatMessageProps) {
 
   return (
     <div
-      className={`${hasTable ? 'w-full' : 'max-w-3xl'} ${
-        message.sender === "user" ? "ml-auto" : "mr-auto"
-      }`}
+    className={`
+      group
+      transition-all duration-300
+      ${hasTable ? 'w-full' : 'max-w-3xl'}
+      ${message.sender === "user" ? "ml-auto" : "mr-auto"}
+    `}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       ref={messageRef}
     >
-      <div className="flex gap-1 items-center">
+      <div className="flex gap-2 items-center mb-1 opacity-80">
         <div>
           <LogoIcon
             width={20}
             height={20}
-            color={message.sender === "user" ? "#6366F1" : "#1F2937"}
+            color={message.sender === "user" ? "#A78BFA" : "#E5E7EB"}
           />
         </div>
-        <h3 className="font-semibold">
+        <h3 className="text-xs font-medium tracking-wide text-white/50">
           {message.sender === "user" ? "You" : "Travel Assistant"}
         </h3>
 
@@ -129,12 +132,33 @@ export default function ChatMessage({ message }: ChatMessageProps) {
         )}
       </div>
       <div
-        className={`mt-1 p-4 rounded-lg ${
-          message.sender === "user"
-            ? "bg-indigo-100 text-gray-800"
-            : "bg-white text-gray-700 shadow-sm"
-        }`}
-      >
+          className={`
+            mt-1
+            p-4
+            rounded-2xl
+            backdrop-blur-xl
+            border
+            transition-all duration-300
+            ${
+              message.sender === "user"
+                ? `
+                  bg-gradient-to-br
+                  from-indigo-500/20
+                  to-purple-500/20
+                  border-indigo-400/30
+                  text-white
+                  shadow-[0_0_30px_rgba(99,102,241,0.35)]
+                  ml-auto
+                `
+                : `
+                  bg-white/[0.03]
+                  border-white/5
+                  text-white/80
+                  shadow-[0_0_20px_rgba(99,102,241,0.08)]
+                `
+            }
+          `}
+        >
         {isDocumentMessage ? (
           // For document uploads, show a special message
           <div>
@@ -202,7 +226,11 @@ export default function ChatMessage({ message }: ChatMessageProps) {
                 Processing document content...
               </div>
             ) : (
-              <div className="text-sm max-h-60 overflow-y-auto whitespace-pre-wrap bg-gray-50 p-3 rounded-md">
+              <div className="text-sm max-h-60 overflow-y-auto whitespace-pre-wrap bg-white/[0.04]
+                            border border-white/10
+                            backdrop-blur-lg
+                            p-3
+                            rounded-xl">
                 {message.text.split("Content:")[1]?.trim() ||
                   "Processing document content..."}
               </div>
@@ -221,20 +249,18 @@ export default function ChatMessage({ message }: ChatMessageProps) {
                 </div>
               ),
               thead: ({ ...props }) => (
-                <thead className="bg-gray-100" {...props} />
+                <thead className="bg-white/[0.04]" {...props} />
               ),
               tbody: ({ ...props }) => (
-                <tbody className="bg-white divide-y divide-gray-200" {...props} />
+                <tbody className="bg-white/[0.02] divide-y divide-white/10" {...props} />
               ),
               th: ({ ...props }) => (
-                <th
-                  className="px-4 py-3 border border-gray-200 text-left text-sm font-medium text-gray-700"
+                <th className="px-4 py-3 border border-white/10 text-left text-sm font-medium text-white/80"
                   {...props}
                 />
               ),
               td: ({ ...props }) => (
-                <td
-                  className="px-4 py-3 border border-gray-200 text-sm text-gray-900"
+                <td className="px-4 py-3 border border-white/10 text-sm text-white/70"
                   {...props}
                 />
               ),

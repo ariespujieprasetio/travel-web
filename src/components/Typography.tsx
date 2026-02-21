@@ -26,22 +26,20 @@ const Typography: FC<TypographyProps> = ({
     className,
     style,
     htmlFor
-}) => {
+  }) => {
     return (
-        <Component
-            htmlFor={htmlFor}
-            className={classNames(variantStyles[variant], className)}
-            style={{
-
-                color: '#404063',
-
-
-                ...style
-            }}
-        >
-            {children}
-        </Component>
+      <Component
+        htmlFor={htmlFor}
+        className={classNames(
+          variantStyles[variant],
+          "text-white/90",   
+          className
+        )}
+        style={style}
+      >
+        {children}
+      </Component>
     );
-};
+  };
 
 export default Typography;
