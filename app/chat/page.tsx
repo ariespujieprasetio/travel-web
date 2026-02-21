@@ -353,44 +353,50 @@ useEffect(() => {
     };
   }, []);
   
-  // Loading state
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen bg-gray-100">
-        <div className="p-6 bg-white shadow-lg rounded-lg">
-          <h2 className="text-lg font-semibold mb-4">Loading Travel Assistant...</h2>
-          <div className="animate-spin w-6 h-6 border-2 border-purple-600 border-t-transparent rounded-full mx-auto"></div>
-        </div>
-      </div>
-    );
-  }
+  // // Loading state
+  // if (loading) {
+  //   return (
+  //     <div className="flex justify-center items-center min-h-screen bg-gray-100">
+  //       <div className="p-6 bg-white shadow-lg rounded-lg">
+  //         <h2 className="text-lg font-semibold mb-4">Loading Travel Assistant...</h2>
+  //         <div className="animate-spin w-6 h-6 border-2 border-purple-600 border-t-transparent rounded-full mx-auto"></div>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
-  // Error state
-  if (error) {
-    return (
-      <div className="flex justify-center items-center min-h-screen bg-gray-100">
-        <div className="p-6 bg-white shadow-lg rounded-lg">
-          <h2 className="text-lg font-semibold mb-4 text-red-600">Error</h2>
-          <p>{error}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="mt-4 bg-purple-600 text-white px-4 py-2 rounded-md w-full"
-          >
-            Retry
-          </button>
-        </div>
-      </div>
-    );
-  }
+  // // Error state
+  // if (error) {
+  //   return (
+  //     <div className="flex justify-center items-center min-h-screen bg-gray-100">
+  //       <div className="p-6 bg-white shadow-lg rounded-lg">
+  //         <h2 className="text-lg font-semibold mb-4 text-red-600">Error</h2>
+  //         <p>{error}</p>
+  //         <button
+  //           onClick={() => window.location.reload()}
+  //           className="mt-4 bg-purple-600 text-white px-4 py-2 rounded-md w-full"
+  //         >
+  //           Retry
+  //         </button>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="min-h-screen flex flex-col h-[100vh]">
       {/* Chat Header - Desktop version (hidden on mobile) */}
-      <div className="hidden lg:flex justify-between p-4 text-lg font-bold shadow-sm bg-white">
+      <div className="
+            hidden lg:flex justify-between p-4
+            text-lg font-bold
+            bg-white/[0.03]
+            backdrop-blur-xl
+            border-b border-white/10
+          ">
         <div>
           <header>{sessionTitle}</header>
           {sessionTagline && (
-            <p className="text-sm font-normal text-gray-500">{sessionTagline}</p>
+            <p className="text-sm font-normal text-white/50">{sessionTagline}</p>
           )}
         </div>
         
@@ -404,13 +410,95 @@ useEffect(() => {
       {/* Chat Messages */}
       <div
         ref={containerRef}
-        className="flex-grow flex flex-col gap-3 p-4 overflow-y-auto bg-gradient-to-b from-indigo-50 to-white"
+        className="
+          relative
+          flex-grow
+          flex
+          flex-col
+          gap-3
+          p-4
+          overflow-y-auto
+          bg-gradient-to-b
+          from-indigo-950/40
+          to-[#020617]
+        "
       >
+        {loading && (
+            <div className="
+              absolute
+              inset-0
+              flex
+              items-center
+              justify-center
+              backdrop-blur-sm
+            bg-[#020617]/80
+              z-30
+            ">
+              <div className="
+                w-8 h-8
+                border-2
+                border-indigo-400
+                border-t-transparent
+                rounded-full
+                animate-spin
+              " />
+            </div>
+          )}
+
+            {error && (
+              <div className="
+                absolute
+                inset-0
+                flex
+                items-center
+                justify-center
+                backdrop-blur-sm
+                bg-[#020617]/90
+                z-40
+              ">
+                <div className="
+                  bg-white/[0.05]
+                  border border-white/10
+                  backdrop-blur-xl
+                  text-white
+                  px-6 py-4
+                  rounded-xl
+                  shadow-lg
+                  text-center
+                ">
+                  <p className="mb-3 text-red-400">{error}</p>
+                  <button
+                    onClick={() => window.location.reload()}
+                    className="
+                      px-4 py-2
+                      bg-indigo-600
+                      hover:bg-indigo-700
+                      text-white
+                      rounded-md
+                    "
+                  >
+                    Retry
+                  </button>
+                </div>
+              </div>
+            )}
         {messages
           .filter((msg) => msg.sender !== "bot-loading")
           .map((msg, i) => (
             <ChatMessageComponent key={i} message={msg} />
           ))}
+
+            {messages.length === 0 && !loading && (
+              <div className="
+                text-white/30
+                text-sm
+                text-center
+                mt-10
+                animate-fadeIn
+              ">
+                Start by asking your travel plan
+              </div>
+            )}
         
         {currentBotMessage && (
           <div className="max-w-full sm:max-w-[85%] md:max-w-3xl mr-auto">
@@ -420,19 +508,19 @@ useEffect(() => {
               </div>
               <h3 className="font-semibold">
                 Travel Assistant
-                <span className="ml-2 font-normal text-xs sm:text-sm text-gray-500">typing...</span>
+                <span className="ml-2 font-normal text-xs sm:text-sm text-white/40">typing...</span>
               </h3>
             </div>
             <div className="
                   mt-1 p-4 
                   rounded-2xl 
-                  bg-gradient-to-br from-white to-indigo-50
-                  border border-indigo-100
-                  shadow-md
-                  backdrop-blur-sm
-                  text-gray-800
+                  bg-white/[0.05]
+                  border border-white/10
+                  shadow-[0_0_20px_rgba(99,102,241,0.15)]
+                  backdrop-blur-xl
+                  text-white/90
                   transition
-                  ">
+                ">
               <Markdown  
                 components={{
                   table: ({ ...props }) => (
@@ -441,16 +529,16 @@ useEffect(() => {
                     </div>
                   ),
                   thead: ({ ...props }) => (
-                    <thead className="bg-gray-100" {...props} />
+                    <thead className="bg-white/10" {...props} />
                   ),
                   tbody: ({ ...props }) => (
-                    <tbody className="bg-indigo-100" {...props} />
+                    <tbody className="bg-white/5" {...props} />
                   ),
                   th: ({ ...props }) => (
-                    <th className="px-2 sm:px-4 py-2 border border-gray-200 text-left text-xs sm:text-sm font-medium text-gray-700" {...props} />
+                    <th className="px-2 py-2 border border-white/10 text-left text-xs sm:text-sm font-medium text-white/80" {...props} />
                   ),
                   td: ({ ...props }) => (
-                    <td className="px-2 sm:px-4 py-2 border border-gray-200 text-xs sm:text-sm text-gray-900" {...props} />
+                    <td className="px-2 py-2 border border-white/10 text-xs sm:text-sm text-white/70" {...props} />
                   ),
                 }} 
                 remarkPlugins={[remarkGfm]}
@@ -526,12 +614,18 @@ useEffect(() => {
       </div>
 
       {/* Bottom Menu and Chat Input */}
-      <div className="w-full bg-white border-t mt-auto">
+      <div className="
+            w-full
+            bg-white/[0.03]
+            backdrop-blur-xl
+            border-t border-white/10
+            mt-auto
+            ">
         {/* Bottom Menu */}
         <div className="grid grid-cols-4 divide-x border-b">
           <button 
             onClick={handleNewChat}
-            className="flex flex-col items-center justify-center py-2 text-gray-600 hover:bg-gray-50 transition"
+            className="flex flex-col items-center justify-center py-2 text-white/60 hover:bg-white/10 transition"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -573,7 +667,15 @@ useEffect(() => {
         
         {/* Chat Input */}
         <div className="px-2 sm:px-6 md:px-10 lg:px-20 py-3">
-          <div className="p-2 shadow-md flex items-center border border-gray-300 rounded-lg bg-white">
+        <div className="
+              p-2
+              shadow-md
+              flex items-center
+              border border-white/10
+              rounded-lg
+              bg-white/[0.03]
+              backdrop-blur-xl
+              ">
             {/* File Upload Button */}
             {sessionManager.getCurrentSessionId() && (
               <div className="ml-1 mr-2">
@@ -591,7 +693,13 @@ useEffect(() => {
               ref={textareaRef}
               rows={1}
               placeholder="Ask about travel destinations..."
-              className="flex-1 resize-none p-2 outline-none text-sm sm:text-base max-h-40"
+              className="
+              flex-1 resize-none p-2 outline-none
+              text-sm sm:text-base max-h-40
+              bg-transparent
+              text-white
+              placeholder:text-white/40
+              "
               value={input}
               onChange={(e) => {
                 setInput(e.target.value);

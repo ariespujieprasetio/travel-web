@@ -147,7 +147,17 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
   }
 
   return (
-    <div className="flex min-h-screen relative">
+        <div className="
+        flex min-h-screen relative
+        bg-[#020617]
+        text-white
+        overflow-hidden
+        ">
+
+          <div className="pointer-events-none absolute inset-0 -z-10">
+            <div className="absolute w-[700px] h-[700px] bg-purple-600/20 blur-[200px] top-[-200px] right-[-200px]" />
+            <div className="absolute w-[600px] h-[600px] bg-indigo-600/20 blur-[180px] bottom-[-200px] left-[-200px]" />
+          </div>
       {sidebarOpen && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 z-20 lg:hidden"
@@ -156,7 +166,12 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
       )}
 
       <aside className={`fixed lg:relative h-screen z-30 lg:z-auto w-[280px] sm:w-[320px] lg:w-[25%] 
-        min-h-screen bg-white border-r shadow-md flex flex-col 
+            min-h-screen
+            bg-white/[0.03]
+            backdrop-blur-xl
+            border-r border-white/10
+            shadow-[0_0_40px_rgba(99,102,241,0.15)]
+            flex flex-col 
         transition-all duration-300 ease-in-out ${sidebarOpen ? 'left-0' : '-left-[320px] lg:left-0'}`}
       >
         {/* Header */}
@@ -196,8 +211,8 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
         </div>
 
         {/* Session List */}
-        <div className="mt-6 text-gray-600 px-6 flex-1 flex flex-col min-h-0">
-          <div className="font-medium text-sm uppercase tracking-wider mb-3 text-gray-500">
+        <div className="mt-6 text-white/60 px-6 flex-1 flex flex-col min-h-0">
+        <div className="font-medium text-sm uppercase tracking-wider mb-3 text-white/40">
             Recent Conversations
           </div>
           <div className="flex-1 overflow-y-auto space-y-3 pr-2 min-h-0">
@@ -209,10 +224,16 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
               <div
                 key={session.id}
                 className={`
-                  py-3 px-4 rounded-lg cursor-pointer transition-all border relative
+                      group
+                      py-3 px-4
+                      rounded-xl
+                      cursor-pointer
+                      transition-all
+                      border
+                      relative
                   ${activeSessionId === session.id
-                    ? "bg-purple-100 border-purple-400 shadow-sm"
-                    : "hover:bg-purple-50 border-gray-100 hover:border-purple-200"
+                    ? "bg-purple-500/20 border-purple-400/40 shadow-[0_0_20px_rgba(139,92,246,0.4)]"
+                    : "bg-white/[0.02] border-white/10 hover:border-purple-500/40 hover:bg-white/[0.05]"
                   }
                   `}
                 onClick={() => switchSession(session.id)}
@@ -247,28 +268,35 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
                   />
                 ) : (
                   <div
-                    className="font-medium text-gray-800 truncate"
-                    onDoubleClick={(e) => {
-                      e.stopPropagation()
-                      setEditingId(session.id)
-                      setTitles((prev) => ({ ...prev, [session.id]: session.title ?? "" }))
-                    }}
-                  >
+                      className="
+                        font-medium
+                        text-white/80
+                        truncate
+                        transition-all
+                        duration-200
+                        group-hover:text-white
+                      "
+                      onDoubleClick={(e) => {
+                        e.stopPropagation()
+                        setEditingId(session.id)
+                        setTitles((prev) => ({ ...prev, [session.id]: session.title ?? "" }))
+                      }}
+                    >
                     {session.title || "New Conversation"}
                   </div>
                 )}
 
                 {session.tagline && (
-                  <div className="text-xs text-gray-600 truncate">{session.tagline}</div>
+                  <div className="text-xs text-white/50 truncate">{session.tagline}</div>
                 )}
-                <div className="text-xs text-gray-400 mt-1">{new Date(session.updatedAt).toLocaleString()}</div>
+                <div className="text-xs text-white/40 mt-1">{new Date(session.updatedAt).toLocaleString()}</div>
               </div>
             ))}
           </div>
         </div>
 
         {/* User Info & Logout */}
-        <div className="mt-auto pt-4 border-t border-gray-100 px-6 pb-6">
+        <div className="mt-auto pt-4 border-t border-white/10 px-6 pb-6">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-purple-100 text-purple-800 flex items-center justify-center font-bold text-lg">
               {user?.name ? user.name[0].toUpperCase() : user?.email ? user.email[0].toUpperCase() : 'U'}
@@ -288,16 +316,25 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
         </div>
       </aside>
 
-      <main className="w-full lg:w-[75%] bg-gray-50 min-h-full">
+      <main className="w-full lg:w-[75%] bg-transparent min-h-full">
         {!loading && children}
       </main>
 
       {/* Delete Session Modal */}
       {sessionToDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-[90%] max-w-sm">
-            <h2 className="text-lg font-semibold mb-2 text-gray-800">Delete Chat Session?</h2>
-            <p className="text-sm text-gray-600 mb-4">
+        <div className="
+        bg-white/[0.05]
+        backdrop-blur-xl
+        border border-white/10
+        p-6
+        rounded-lg
+        shadow-xl
+        w-[90%]
+        max-w-sm
+        ">
+            <h2 className="text-lg font-semibold mb-2 text-white/90 tracking-wide">Delete Chat Session?</h2>
+            <p className="text-sm text-white/60 mb-4">
               Are you sure you want to delete the session <strong>{sessionToDelete.title || 'New Conversation'}</strong>?
             </p>
             <div className="flex justify-end gap-3">
