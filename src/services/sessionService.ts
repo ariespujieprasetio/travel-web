@@ -6,319 +6,272 @@ import { ApiMessage, formatApiMessagesToUiMessages } from "@/src/utils/chatUtils
 import { ChatMessage } from "@/src/utils/chatUtils";
 import { getSocket, setupChatListener, sendMessage as socketSendMessage } from "@/src/services/socketService";
 
+const isDemo = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
 
 interface ChatSessionWindow extends Window {
   setChatSession?: (sessionId: string) => void;
   chatSessions?: ChatSession[];
 }
-/**
- * Manages chat sessions and their state
- */
+
 export class SessionManager {
   private currentSessionId: string = "";
   private currentSessionSaved: boolean = false;
   private sessionsUpdatedCallback: ((sessions: ChatSession[]) => void) | null = null;
-  
-  /**
-   * Initialize the session manager and link to global window
-   */
+
   constructor() {
-    // Register the session switcher on window
     if (typeof window !== 'undefined') {
       (window as ChatSessionWindow).setChatSession = (sessionId: string) => {
-        console.log(sessionId)
         this.switchSession(sessionId);
       };
     }
   }
 
-  
-  // Add this method to your SessionManager class
-  /**
-   * Set up a listener for title updates on a specific session
-   * @param sessionId - The ID of the session to listen for title updates on
-   * @param onTitleUpdate - Callback for when the title is updated
-   * @returns Cleanup function to remove the listener
-   */
   public setupTitleUpdateListener(
     sessionId: string,
     onTitleUpdate: (title: string, tagline: string) => void
   ): () => void {
-    if (!sessionId) {
-      console.error("Cannot setup title listener: No active session");
-      return () => {};
-    }
-    
+
+    if (isDemo) return () => {};
+
+    if (!sessionId) return () => {};
+
     const socket = getSocket();
-    if (!socket) {
-      console.error("Cannot setup title listener: Socket not connected");
-      return () => {};
-    }
-    
-    // Set up event listener for title updates
+    if (!socket) return () => {};
+
     const eventName = `update-title-tagline-${sessionId}`;
     const handleTitleUpdate = (data: { title: string; tagline: string }) => {
-      console.log(`Title updated for session ${sessionId}:`, data);
-      
-      // Update our local sessions list if we have one
       this.updateSessionInCache(sessionId, {
         title: data.title,
         tagline: data.tagline
       });
-      
-      // Call the callback with the new data
-      if (onTitleUpdate) {
-        onTitleUpdate(data.title, data.tagline);
-      }
+      onTitleUpdate?.(data.title, data.tagline);
     };
-    
+
     socket.on(eventName, handleTitleUpdate);
-    
-    // Return cleanup function
+
     return () => {
       socket.off(eventName, handleTitleUpdate);
     };
   }
-  
-  /**
-   * Helper method to update a session in the local cache
-   * @param sessionId - The ID of the session to update
-   * @param updates - Object with properties to update
-   */
+
   private updateSessionInCache(sessionId: string, updates: Partial<ChatSession>): void {
-    // Load sessions
     const sessions = this.loadSessionsFromStorage();
     if (!sessions) return;
-    
-    // Find and update the session
+
     const updatedSessions = sessions.map(session => {
       if (session.id === sessionId) {
         return {
           ...session,
           ...updates,
-          updatedAt: new Date().toISOString() // Update the timestamp
+          updatedAt: new Date().toISOString()
         };
       }
       return session;
     });
-    
-    // Save updated sessions back to storage
+
     this.saveSessionsToStorage(updatedSessions);
-    
-    // Notify about the update
     this.notifySessionsUpdated(updatedSessions);
   }
-  
-  /**
-   * Load sessions from storage
-   * @returns Array of sessions or null if not available
-   */
+
   private loadSessionsFromStorage(): ChatSession[] | null {
     if (typeof window === 'undefined') return null;
-    
     try {
       const sessionsJSON = sessionStorage.getItem('chatSessions');
       return sessionsJSON ? JSON.parse(sessionsJSON) : null;
-    } catch (e) {
-      console.error('Error loading sessions from storage:', e);
+    } catch {
       return null;
     }
   }
-  
-  /**
-   * Save sessions to storage
-   * @param sessions - The sessions to save
-   */
+
   private saveSessionsToStorage(sessions: ChatSession[]): void {
     if (typeof window === 'undefined') return;
-    
-    try {
-      sessionStorage.setItem('chatSessions', JSON.stringify(sessions));
-    } catch (e) {
-      console.error('Error saving sessions to storage:', e);
-    }
+    sessionStorage.setItem('chatSessions', JSON.stringify(sessions));
   }
-  
-  /**
-   * Set a callback for when sessions are updated
-   * @param callback - Function to call when sessions change
-   */
+
   public onSessionsUpdated(callback: (sessions: ChatSession[]) => void): void {
     this.sessionsUpdatedCallback = callback;
   }
-  
-  /**
-   * Get the current session ID
-   * @returns The current session ID
-   */
+
   public getCurrentSessionId(): string {
     return this.currentSessionId;
   }
+
   public getCurrentSessionSaved(): boolean {
     return this.currentSessionSaved;
   }
-  
-  /**
-   * Set the current session ID
-   * @param sessionId - The session ID to set as current
-   */
+
   public setCurrentSessionId(sessionId: string): void {
     this.currentSessionId = sessionId;
   }
+
   public setCurrentSessionSaved(save: boolean): void {
     this.currentSessionSaved = save;
   }
-  /**
-   * Notify about sessions update
-   * @param sessions - The updated sessions list
-   */
+
   private notifySessionsUpdated(sessions: ChatSession[]): void {
-    if (this.sessionsUpdatedCallback) {
-      this.sessionsUpdatedCallback(sessions);
-    }
-    
-    // Also update the global window reference
+    this.sessionsUpdatedCallback?.(sessions);
+
     if (typeof window !== 'undefined') {
       (window as ChatSessionWindow).chatSessions = sessions;
-      
-      // Dispatch custom event for any other components listening
-      const event = new CustomEvent('sessionsUpdated', { detail: sessions });
-      window.dispatchEvent(event);
+      window.dispatchEvent(new CustomEvent('sessionsUpdated', { detail: sessions }));
     }
   }
-  
-  /**
-   * Load all chat sessions
-   * @returns Promise resolving to all chat sessions
-   */
-  public async loadSessions(): Promise<ChatSession[]> {
-    try {
-      const sessions = await apiService.getChatSessions();
-      this.notifySessionsUpdated(sessions);
-      return sessions;
-    } catch (error) {
-      console.error("Failed to load sessions:", error);
-      throw error;
-    }
-  }
-  
-  /**
-   * Create a new chat session
-   * @returns Promise resolving to the new session
-   */
-  public async createSession(): Promise<ChatSession> {
-    try {
-      sessionStorage.setItem('activeSessionId',"");
 
-      const newSession = await apiService.createChatSession();
-      
-      // Update the current session ID
-      this.setCurrentSessionId(newSession.id);
-      this.setCurrentSessionSaved(newSession.save ?? false);
-      
-      // Store the session ID in sessionStorage
-      if (typeof window !== 'undefined') {
-        sessionStorage.setItem('activeSessionId', newSession.id);
-      }
-      
-      // Update the sessions list
-      await this.loadSessions();
-      
-      return newSession;
-    } catch (error) {
-      console.error("Failed to create new session:", error);
-      throw error;
+  public async loadSessions(): Promise<ChatSession[]> {
+
+    if (isDemo) {
+      const now = new Date().toISOString()
+
+      const demoSessions: ChatSession[] = [
+        {
+          id: "demo-1",
+          title: "Exploring Japan Adventures",
+          tagline: "Explore your next destination",
+          updatedAt: now,
+          createdAt: now,
+          userId: "demo-user",
+          save: false
+        },
+        {
+          id: "demo-2",
+          title: "Exploring Bali Getaway",
+          tagline: "Plan your dream vacation",
+          updatedAt: now,
+          createdAt: now,
+          userId: "demo-user",
+          save: false
+        }
+      ];
+
+      this.notifySessionsUpdated(demoSessions);
+      return demoSessions;
     }
+
+    const sessions = await apiService.getChatSessions();
+    this.notifySessionsUpdated(sessions);
+    return sessions;
   }
-  /**
- * Load a specific session with its messages
- * @param sessionId - The ID of the session to load
- * @returns Promise resolving to formatted chat messages
- */
-public async loadSession(sessionId: string): Promise<ChatMessage[]> {
-  try {
-    console.log(sessionId)
-    // Get the session with messages
-    const sessionWithMessages = await apiService.getChatSession(sessionId);
-    
-    // Store the session ID
-    this.setCurrentSessionId(sessionId);
-    
-    if (typeof window !== 'undefined') {
-      // sessionStorage.setItem('activeSessionId', sessionId);
+
+  public async createSession(): Promise<ChatSession> {
+
+    if (isDemo) {
+      const now = new Date().toISOString()
+
+      const fakeSession: ChatSession = {
+        id: `demo-${Date.now()}`,
+        title: "New Demo Conversation",
+        tagline: "UI Preview Only",
+        updatedAt: now,
+        createdAt: now,
+        userId: "demo-user",
+        save: false
+      };
+
+      this.setCurrentSessionId(fakeSession.id);
+      this.setCurrentSessionSaved(false);
+      sessionStorage.setItem('activeSessionId', fakeSession.id);
+
+      return fakeSession;
     }
-    
-    // Format messages for UI - cast to ApiMessage[] since we know the structure is compatible
+
+    sessionStorage.setItem('activeSessionId',"");
+
+    const newSession = await apiService.createChatSession();
+    this.setCurrentSessionId(newSession.id);
+    this.setCurrentSessionSaved(newSession.save ?? false);
+
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('activeSessionId', newSession.id);
+    }
+
+    await this.loadSessions();
+    return newSession;
+  }
+
+  public async loadSession(sessionId: string): Promise<ChatMessage[]> {
+
+    if (isDemo) {
+      this.setCurrentSessionId(sessionId);
+      return [
+        {
+          sender: "bot",
+          text: "Hello! 👋 I'm your AI Travel Planner. Where would you like to go?"
+        }
+      ];
+    }
+
+    const sessionWithMessages = await apiService.getChatSession(sessionId);
+    this.setCurrentSessionId(sessionId);
+
     return formatApiMessagesToUiMessages(
       (sessionWithMessages.messages ?? []) as ApiMessage[]
     );
-  } catch (error) {
-    console.error(`Failed to load session ${sessionId}:`, error);
-    throw error;
   }
-}
-  /**
-   * Switch to a different chat session
-   * @param sessionId - The ID of the session to switch to
-   * @param onMessagesLoaded - Callback for when messages are loaded
-   * @returns Promise resolving when the switch is complete
-   */
+
   public async switchSession(
     sessionId: string,
     onMessagesLoaded?: (messages: ChatMessage[]) => void
   ): Promise<void> {
-    try {
-      if (sessionId === this.currentSessionId) return; // Already on this session
-      
-      const messages = await this.loadSession(sessionId);
-      
-      if (onMessagesLoaded) {
-        onMessagesLoaded(messages);
-      }
-    } catch (error) {
-      console.error(`Failed to switch to session ${sessionId}:`, error);
-      throw error;
-    }
+    if (sessionId === this.currentSessionId) return;
+    const messages = await this.loadSession(sessionId);
+    onMessagesLoaded?.(messages);
   }
-  
-  /**
-   * Send a message in the current session
-   * @param message - The message to send
-   * @returns Promise resolving when the message is sent
-   */
+
   public async sendMessage(message: string, updateTitle = false): Promise<void> {
+
     if (!this.currentSessionId) {
       throw new Error("No active session to send message to");
     }
-    
+
+    if (isDemo) {
+      return new Promise((resolve) => {
+        setTimeout(() => resolve(), 300);
+      });
+    }
+
     return socketSendMessage(this.currentSessionId, message, updateTitle);
   }
-  
-  /**
-   * Set up a listener for incoming messages on the current session
-   * @param onMessageChunk - Callback for each message chunk
-   * @param onMessageComplete - Callback for when a message is complete
-   * @returns Cleanup function to remove the listener
-   */
+
   public setupMessageListener(
     onMessageChunk: (msg: string) => void,
     onMessageComplete: () => void
   ): () => void {
-    if (!this.currentSessionId) {
-      console.error("Cannot setup listener: No active session");
-      return () => {};
+
+    if (isDemo) {
+
+      const demoText =
+`Sure! Here's a suggested 5-day itinerary ✈️
+
+Day 1 — Arrival & City Walk  
+Day 2 — Cultural Landmarks  
+Day 3 — Local Cuisine Tour  
+Day 4 — Nature Exploration  
+Day 5 — Shopping & Departure`;
+
+      let i = 0;
+
+      const interval = setInterval(() => {
+        if (i >= demoText.length) {
+          clearInterval(interval);
+          onMessageComplete();
+          return;
+        }
+        onMessageChunk(demoText[i]);
+        i++;
+      }, 18);
+
+      return () => clearInterval(interval);
     }
-    
+
+    if (!this.currentSessionId) return () => {};
+
     return setupChatListener(
       this.currentSessionId,
       onMessageChunk,
       onMessageComplete
     );
   }
-  
-  /**
- * Remove a session from storage + notify sidebar/dashboard
- */
+
   public removeSession(sessionId: string): void {
     if (typeof window === 'undefined') return;
 
@@ -327,21 +280,12 @@ public async loadSession(sessionId: string): Promise<ChatMessage[]> {
       if (!sessionsJSON) return
 
       const sessions: ChatSession[] = JSON.parse(sessionsJSON)
+      const updatedSessions = sessions.filter(s => s.id !== sessionId)
 
-      const updatedSessions = sessions.filter(
-        s => s.id !== sessionId
-      )
-
-      sessionStorage.setItem(
-        'chatSessions',
-        JSON.stringify(updatedSessions)
-      )
-
+      sessionStorage.setItem('chatSessions', JSON.stringify(updatedSessions))
       this.notifySessionsUpdated(updatedSessions)
 
-      const activeSessionId =
-        sessionStorage.getItem('activeSessionId')
-
+      const activeSessionId = sessionStorage.getItem('activeSessionId')
       if (activeSessionId === sessionId) {
         sessionStorage.setItem('activeSessionId', '')
         this.setCurrentSessionId('')
@@ -352,17 +296,11 @@ public async loadSession(sessionId: string): Promise<ChatMessage[]> {
     }
   }
 
-  /**
-   * Clean up the session manager
-   */
   public cleanup(): void {
     if (typeof window !== 'undefined') {
       (window as ChatSessionWindow).setChatSession = undefined;
     }
   }
-  
 }
 
-
-// Create singleton instance
 export const sessionManager = new SessionManager();
