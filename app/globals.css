@@ -2,55 +2,47 @@
 @tailwind components;
 @tailwind utilities;
 
+/* 🌌 GLOBAL DARK AI THEME */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #020617;
+  --foreground: #e5e7eb;
 }
 
-/* @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-} */
-
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-
-/* Landing page custom styles */
-
-/* Custom animation for gradient background */
-@keyframes gradientFlow {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
-.animate-gradient {
-  background-size: 200% 200%;
-  animation: gradientFlow 3s ease infinite;
-}
-
-/* Smooth scroll behavior for anchor links */
 html {
   scroll-behavior: smooth;
 }
 
-/* Chat bubble animations */
+body {
+  @apply bg-[#020617] text-gray-200 antialiased;
+  font-family: Inter, Arial, Helvetica, sans-serif;
+}
+
+
+/* ✨ AI GLOW BACKGROUND AURA */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -10;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(139,92,246,0.15), transparent 40%),
+    radial-gradient(circle at 80% 80%, rgba(99,102,241,0.15), transparent 40%);
+  filter: blur(100px);
+}
+
+
+/* ✨ GLASS CARD BASE */
+.glass {
+  @apply bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl;
+}
+
+
+/* ✨ CHAT BUBBLE */
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(8px);
   }
   to {
     opacity: 1;
@@ -59,76 +51,57 @@ html {
 }
 
 .chat-bubble {
-  animation: fadeInUp 0.3s ease-out;
+  animation: fadeInUp 0.25s ease-out;
 }
 
-/* Destination card hover effect */
-.destination-card {
-  overflow: hidden;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
 
-.destination-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-}
-
-.destination-card img {
-  transition: transform 0.5s ease;
-}
-
-.destination-card:hover img {
-  transform: scale(1.05);
-}
-
-/* Pulsing effect for CTA buttons */
-@keyframes pulse {
+/* ✨ CTA GLOW */
+@keyframes pulseGlow {
   0% {
-    box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.4);
+    box-shadow: 0 0 0 0 rgba(139,92,246,0.4);
   }
   70% {
-    box-shadow: 0 0 0 10px rgba(124, 58, 237, 0);
+    box-shadow: 0 0 0 15px rgba(139,92,246,0);
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(124, 58, 237, 0);
+    box-shadow: 0 0 0 0 rgba(139,92,246,0);
   }
 }
 
 .pulse-button {
-  animation: pulse 2s infinite;
+  animation: pulseGlow 2s infinite;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .hero-section {
-    padding-top: 6rem;
-    padding-bottom: 4rem;
-  }
-  
-  .hero-title {
-    font-size: 2.5rem;
-  }
-  
-  .hero-content {
-    text-align: center;
-  }
-}
 
-/* Custom scrollbar */
+/* ✨ SCROLLBAR DARK MODE */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 10px;
+  background: #020617;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #c4b5fd;
-  border-radius: 10px;
+  background: rgba(139,92,246,0.5);
+  border-radius: 999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #8b5cf6;
+  background: rgba(139,92,246,0.8);
+}
+
+@keyframes float1 {
+  0%,100% { transform: translateY(0px); }
+  50% { transform: translateY(40px); }
+}
+
+@keyframes float2 {
+  0%,100% { transform: translateX(0px); }
+  50% { transform: translateX(-40px); }
+}
+
+@keyframes float3 {
+  0%,100% { transform: translateY(0px) translateX(0px); }
+  50% { transform: translateY(-30px) translateX(30px); }
 }

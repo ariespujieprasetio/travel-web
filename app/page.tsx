@@ -154,38 +154,128 @@ export default function LandingPage() {
           `}
         >
           {cards.map((d, i) => (
-            <a
-              key={d.name}
-              href={d.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group rounded-xl overflow-hidden shadow-md hover:shadow-2xl transition-shadow hover:scale-105 bg-white relative"
-            >
-              <img src={d.img} alt={d.name} className="w-full h-64 object-cover" />
-              <div className="absolute inset-0 bg-black/30"></div>
-              <div className="absolute top-0 left-0 w-full h-full bg-white/20 opacity-0 group-hover:opacity-100 transition-all duration-300"></div>
-              <div className="absolute bottom-0 left-0 w-full px-4 py-3">
-                <h3 className="text-xl sm:text-2xl font-bold text-white drop-shadow-lg">{d.name}</h3>
-              </div>
-            </a>
-          ))}
+          <a
+            key={`${d.name}-${slide}-${i}`}
+            href={d.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="
+            group
+            relative
+            rounded-2xl
+            overflow-hidden
+            bg-white/5
+            backdrop-blur-xl
+            border border-white/10
+            transition-all duration-500
+            will-change-transform
+            hover:scale-[1.04]
+            hover:-translate-y-2
+            hover:shadow-[0_0_80px_rgba(139,92,246,0.55)]
+
+            before:content-['']
+            before:absolute
+            before:inset-0
+            before:rounded-2xl
+            before:bg-gradient-to-r
+            before:from-purple-500/0
+            before:via-purple-500/30
+            before:to-cyan-500/0
+            before:opacity-0
+            before:blur-xl
+            before:transition
+            before:duration-700
+            group-hover:before:opacity-100
+            "
+          >
+            <img
+              src={d.img}
+              alt={d.name}
+              className="
+              w-full h-64 object-cover
+              transition-transform duration-700 ease-out
+              group-hover:scale-110
+              "
+            />
+
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+
+            <div className="
+              absolute inset-0
+              bg-white/10
+              opacity-0
+              group-hover:opacity-100
+              transition duration-500
+            " />
+
+            <div className="absolute bottom-0 left-0 w-full px-4 py-3">
+              <h3 className="
+                text-xl sm:text-2xl
+                font-bold
+                text-white
+                drop-shadow-[0_0_10px_rgba(255,255,255,0.4)]
+              ">
+                {d.name}
+              </h3>
+            </div>
+          </a>
+        ))}
         </div>
         {/* Navigasi panah */}
         <button
           onClick={() => handleSlide('prev')}
-          className="absolute left-0 top-1/2 -translate-y-1/2 bg-white border border-gray-300 rounded-full shadow-lg w-12 h-12 flex items-center justify-center z-10 hover:bg-gray-100 transition"
+          className="
+          absolute left-0 top-1/2 -translate-y-1/2
+          bg-white/10
+          border border-white/10
+          focus:ring-2 focus:ring-purple-500
+          shadow-[0_0_20px_rgba(139,92,246,0.3)]
+          rounded-full
+          w-12 h-12 flex items-center justify-center z-10
+          hover:bg-white/20
+          transition
+          "
           aria-label="Previous"
           disabled={isAnimating}
         >
-          <svg width="28" height="28" fill="none" stroke="#1a2c1a" strokeWidth="2" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          <svg
+            width="28"
+            height="28"
+            fill="none"
+            stroke="white"
+            strokeWidth="2"
+            viewBox="0 0 24 24"
+          >
+            <path d="M15 19l-7-7 7-7" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
         </button>
+
         <button
           onClick={() => handleSlide('next')}
-          className="absolute right-0 top-1/2 -translate-y-1/2 bg-white border border-gray-300 rounded-full shadow-lg w-12 h-12 flex items-center justify-center z-10 hover:bg-gray-100 transition"
+          className="
+          absolute right-0 top-1/2 -translate-y-1/2
+          bg-white/10
+          border border-white/10
+          focus:ring-2 focus:ring-purple-500
+          shadow-[0_0_20px_rgba(139,92,246,0.3)]
+          rounded-full
+          w-12 h-12 flex items-center justify-center z-10
+          hover:bg-white/20
+          transition
+          "
           aria-label="Next"
           disabled={isAnimating}
         >
-          <svg width="28" height="28" fill="none" stroke="#1a2c1a" strokeWidth="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          <svg
+            width="28"
+            height="28"
+            fill="none"
+            stroke="white"
+            strokeWidth="2"
+            viewBox="0 0 24 24"
+          >
+            <path d="M9 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
         </button>
       </div>
     );
@@ -194,8 +284,48 @@ export default function LandingPage() {
   // Mock chat messages for demonstration
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="fixed w-full bg-white shadow-sm z-50">
+      <div className="relative min-h-screen bg-[#020617] text-white overflow-hidden">
+
+      {/* GLOBAL AMBIENT AI LIGHT */}
+      <div className="pointer-events-none fixed inset-0 -z-10">
+
+        <div className="
+          absolute
+          w-[900px] h-[900px]
+          bg-purple-600/20
+          blur-[220px]
+          top-[-300px] left-[-300px]
+          animate-[float1_18s_ease-in-out_infinite]
+        " />
+
+        <div className="
+          absolute
+          w-[800px] h-[800px]
+          bg-indigo-600/20
+          blur-[200px]
+          bottom-[-300px] right-[-200px]
+          animate-[float2_20s_ease-in-out_infinite]
+        " />
+
+        <div className="
+          absolute
+          w-[600px] h-[600px]
+          bg-cyan-500/10
+          blur-[180px]
+          top-[40%] left-[50%]
+          animate-[float3_25s_ease-in-out_infinite]
+        " />
+
+      </div>
+      <nav className="
+      fixed
+      w-full
+      bg-white/5
+      backdrop-blur-xl
+      border-b border-white/10
+      z-[999]
+      text-white
+      ">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
@@ -223,10 +353,10 @@ export default function LandingPage() {
 
             {/* Navigation Links */}
             <div className="hidden md:flex space-x-6">
-              <a href="#features" className="text-gray-700 hover:text-purple-700">Features</a>
-              <a href="#destinations" className="text-gray-700 hover:text-purple-700">Destinations</a>
-              <a href="#how-it-works" className="text-gray-700 hover:text-purple-700">How It Works</a>
-              <a href="#faq" className="text-gray-700 hover:text-purple-700">FAQ</a>
+              <a href="#features" className="text-gray-300 hover:text-purple-400">Features</a>
+              <a href="#destinations" className="text-gray-300 hover:text-purple-400">Destinations</a>
+              <a href="#how-it-works" className="text-gray-300 hover:text-purple-400">How It Works</a>
+              <a href="#faq" className="text-gray-300 hover:text-purple-400">FAQ</a>
             </div>
 
             {/* Login / Get Started */}
@@ -246,64 +376,114 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <div className="pt-24 lg:pt-32 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+      {/* Hero Section */}
+      <div className="relative overflow-hidden bg-[#020617] text-white pt-24 lg:pt-32">
+
+      {/* AI Gradient Aura */}
+      <div className="absolute inset-0 -z-10">
+        <div className="absolute w-[700px] h-[700px] bg-purple-600/30 blur-[200px] top-[-200px] left-[-200px] animate-pulse" />
+        <div className="absolute w-[700px] h-[700px] bg-indigo-600/30 blur-[200px] bottom-[-200px] right-[-200px] animate-pulse" />
+      </div>
+
+      <div className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+
           {/* Left Column */}
           <div>
-            <h1 className="text-4xl sm:text-5xl font-bold leading-tight mb-6">
-              Your AI Travel Companion for Perfect Trips
+            <h1 className="
+              text-5xl sm:text-6xl font-bold mb-6 leading-tight
+              bg-gradient-to-r from-purple-400 via-indigo-400 to-cyan-400
+              text-transparent bg-clip-text
+            ">
+              Plan Trips with Your Personal AI Copilot
             </h1>
-            <p className="text-lg text-gray-600 mb-8 max-w-lg">
-              Plan your dream vacation with Velutara, your personalized AI travel assistant that helps you discover destinations, create itineraries, and answer all your travel questions.
+
+            <p className="text-lg text-gray-300 mb-8 max-w-lg">
+              Velutara is your intelligent AI travel companion that designs
+              personalized itineraries, optimizes your budget, and guides you
+              through every step of your journey.
             </p>
+
             <div className="flex flex-col sm:flex-row gap-4">
               <a href="/login">
-                <button className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-3 rounded-lg font-medium">
+                <button className="
+                  px-6 py-3 rounded-lg font-medium
+                  bg-gradient-to-r from-purple-600 to-indigo-600
+                  shadow-[0_0_20px_rgba(139,92,246,0.6)]
+                  hover:scale-105 transition
+                ">
                   Start Planning Now
-                </button></a>
+                </button>
+              </a>
+
               <a href="#how-it-works">
-                <button className="border-2 border-purple-600 text-purple-700 px-6 py-3 rounded-lg font-medium">
+                <button className="
+                  px-6 py-3 rounded-lg font-medium
+                  border border-white/20
+                  backdrop-blur-md
+                  bg-white/5
+                  hover:bg-white/10
+                  transition
+                ">
                   Learn How It Works
                 </button>
               </a>
             </div>
           </div>
 
-          {/* Right Column - Chat Demo */}
-          <div className="bg-white rounded-2xl shadow-xl p-4">
+          {/* Right Column - Glass AI Chat */}
+          <div className="
+            relative
+            rounded-2xl
+            bg-white/5
+            backdrop-blur-xl
+            border border-white/10
+            shadow-[0_0_60px_rgba(139,92,246,0.4)]
+            p-6
+
+            after:absolute
+            after:inset-0
+            after:rounded-2xl
+            after:border
+            after:border-purple-500/20
+            after:blur-xl
+            after:opacity-50
+            after:pointer-events-none
+          ">
+
+            {/* Neon Edge */}
+            <div className="absolute inset-0 rounded-2xl border border-purple-500/20 pointer-events-none" />
+
             <div className="flex items-center mb-4">
-              <div className="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center">
-                <svg width="16" height="16" viewBox="0 0 291 295" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M4.99998 126.327L107.49 65.6723" stroke="white" strokeWidth="5" strokeLinecap="round" />
-                  <path d="M92.9844 280.443L158.89 241.433" stroke="white" strokeWidth="5" strokeLinecap="round" />
-                  <path d="M27.7543 65.6723L130.244 5" stroke="white" strokeWidth="5" strokeLinecap="round" />
-                  <path fill="white" d="M120.192 153.709L76.6422 118.667C76.2783 118.373 76.5902 117.784 77.0408 117.922L145.616 138.58" />
-                  <path fill="white" d="M127.228 167.885L136.309 223.029C136.379 223.497 137.037 223.514 137.141 223.046L152.877 153.171" />
-                </svg>
-              </div>
-              <p className="ml-2 font-semibold">Velutara Travel Assistant</p>
+              <div className="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center" />
+              <p className="ml-2 font-semibold text-gray-200">
+                Velutara AI Assistant
+              </p>
             </div>
 
             <div className="space-y-3 mb-4 h-80 overflow-y-auto">
+
               {/* User message */}
-              <div className="bg-purple-100 p-3 rounded-lg ml-10">
-                <p className="text-sm">I want to plan a 3-day trip to Paris for next month.</p>
+              <div className="bg-purple-500/20 p-3 rounded-lg ml-10 border border-purple-400/10">
+                <p className="text-sm text-gray-200">
+                  I want to plan a 3-day trip to Paris next month.
+                </p>
               </div>
 
               {/* Bot message */}
-              <div className="bg-gray-100 p-3 rounded-lg mr-10">
-                <p className="text-sm">
-                  Great choice! For a 3-day Paris trip, I suggest focusing on these highlights:
-                  Day 1 - Eiffel Tower, Louvre Museum, Seine River cruise.
-                  Day 2 - Notre Dame Cathedral, Montmartre, Sacré-Cœur.
-                  Day 3 - Versailles Palace, Latin Quarter, and shopping on Champs-Élysées.
-                  When exactly are you planning to visit?
+              <div className="bg-white/10 p-3 rounded-lg mr-10 border border-white/10">
+                <p className="text-sm text-gray-200">
+                  Great choice! I suggest focusing on Eiffel Tower,
+                  Louvre Museum, Seine River cruise, Montmartre,
+                  and Versailles Palace.
                 </p>
               </div>
 
               {/* User message */}
-              <div className="bg-purple-100 p-3 rounded-lg ml-10">
-                <p className="text-sm">Mid-June, and I&apos;m interested in good food spots too!</p>
+              <div className="bg-purple-500/20 p-3 rounded-lg ml-10 border border-purple-400/10">
+                <p className="text-sm text-gray-200">
+                  I'm also interested in good food spots!
+                </p>
               </div>
             </div>
 
@@ -311,20 +491,35 @@ export default function LandingPage() {
               <input
                 type="text"
                 placeholder="Ask about your next trip..."
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="
+                  w-full px-4 py-3 rounded-lg
+                  bg-white/10
+                  border border-white/10
+                  text-white
+                  focus:outline-none
+                  focus:ring-2 focus:ring-purple-500
+                  shadow-[0_0_20px_rgba(139,92,246,0.3)]
+                "
               />
-              <button className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-purple-600 text-white p-2 rounded-md">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                </svg>
+
+              <button className="
+                absolute right-2 top-1/2 -translate-y-1/2
+                bg-purple-600
+                p-2 rounded-md
+                shadow-[0_0_15px_rgba(139,92,246,0.6)]
+              ">
+                →
               </button>
             </div>
+
           </div>
+
         </div>
+      </div>
       </div>
 
       {/* Trusted By Section */}
-      <section className="py-12 bg-white">
+      <section className="py-12 bg-[#020617] text-gray-400">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-2">
             <p className="text-base font-medium text-purple-600">TRUSTED BY TRAVELERS WORLDWIDE</p>
@@ -333,13 +528,13 @@ export default function LandingPage() {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-16 bg-gray-50">
+      <section id="features" className="py-20 bg-[#020617] text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <Typography variant="h2" component="h2" className="text-3xl sm:text-4xl font-bold mb-4">
               Everything You Need For Perfect Travel Planning
             </Typography>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
               Velutara combines AI intelligence with extensive travel data to help you create memorable journeys without the stress of planning.
             </p>
           </div>
@@ -352,11 +547,19 @@ export default function LandingPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="bg-white rounded-xl shadow-md p-6 border border-gray-100 hover:shadow-lg transition-shadow"
+                className="
+                bg-white/5
+                backdrop-blur-xl
+                border border-white/10
+                rounded-xl
+                p-6
+                hover:shadow-[0_0_40px_rgba(139,92,246,0.3)]
+                transition
+                "
               >
                 <div className="text-3xl mb-4">{feature.icon}</div>
-                <h3 className="text-xl font-semibold mb-2 text-gray-900">{feature.title}</h3>
-                <p className="text-gray-600">{feature.description}</p>
+                <h3 className="text-xl font-semibold mb-2 text-white">{feature.title}</h3>
+                <p className="text-gray-300">{feature.description}</p>
               </motion.div>
             ))}
           </div>
@@ -364,11 +567,11 @@ export default function LandingPage() {
       </section>
 
       {/* Popular Destinations Section */}
-      <section className="py-16 bg-white" id="destinations">
+      <section className="py-20 bg-[#020617] text-white" id="destinations">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-bold mb-4">Explore Popular Destinations</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-white">Explore Popular Destinations</h2>
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
               Discover top cities for business travel — from global financial hubs to well-connected urban centers built for productivity.
             </p>
           </div>
@@ -384,13 +587,13 @@ export default function LandingPage() {
       </section>
 
       {/* How It Works Section */}
-      <section id="how-it-works" className="py-16 bg-gray-50">
+      <section id="how-it-works" className="py-20 bg-[#020617] text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <Typography variant="h2" component="h2" className="text-3xl sm:text-4xl font-bold mb-4">
               How Velutara Works
             </Typography>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
               Planning your perfect trip is easy with our AI-powered assistant.
             </p>
           </div>
@@ -403,9 +606,9 @@ export default function LandingPage() {
               viewport={{ once: true }}
               className="text-center"
             >
-              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 text-2xl font-bold mx-auto mb-4">1</div>
+              <div className="w-16 h-16 bg-purple-500/20 border border-purple-400/20 rounded-full flex items-center justify-center text-purple-600 text-2xl font-bold mx-auto mb-4">1</div>
               <h3 className="text-xl font-semibold mb-2">Tell Us Your Travel Plans</h3>
-              <p className="text-gray-600">
+              <p className="text-gray-300">
                 Seamless travel arrangements tailored for busy professionals. Where do you want to go next?
               </p>
             </motion.div>
@@ -417,9 +620,9 @@ export default function LandingPage() {
               viewport={{ once: true }}
               className="text-center"
             >
-              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 text-2xl font-bold mx-auto mb-4">2</div>
+              <div className="w-16 h-16 bg-purple-500/20 border border-purple-400/20 rounded-full flex items-center justify-center text-purple-600 text-2xl font-bold mx-auto mb-4">2</div>
               <h3 className="text-xl font-semibold mb-2">Get Personalized Recommendations</h3>
-              <p className="text-gray-600">
+              <p className="text-gray-300">
                 Our AI analyzes your requirements and generates tailored itineraries, accommodation options, and activities.
               </p>
             </motion.div>
@@ -431,20 +634,27 @@ export default function LandingPage() {
               viewport={{ once: true }}
               className="text-center"
             >
-              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 text-2xl font-bold mx-auto mb-4">3</div>
+              <div className="w-16 h-16 bg-purple-500/20 border border-purple-400/20 rounded-full flex items-center justify-center text-purple-600 text-2xl font-bold mx-auto mb-4">3</div>
               <h3 className="text-xl font-semibold mb-2">Enjoy Your Perfect Trip</h3>
-              <p className="text-gray-600">
+              <p className="text-gray-300">
                 Save your itinerary, make adjustments as needed, and access your travel plans anytime from any device.
               </p>
             </motion.div>
           </div>
 
-          <div className="mt-16 bg-white rounded-xl shadow-lg overflow-hidden">
+          <div className="
+          mt-16
+          bg-white/5
+          backdrop-blur-xl
+          border border-white/10
+          rounded-xl
+          overflow-hidden
+          ">
             <div className="grid md:grid-cols-2">
               <div className="p-8 sm:p-10 flex items-center">
                 <div>
-                  <h3 className="text-2xl font-bold mb-4 text-gray-900">Start Your Travel Adventure Today</h3>
-                  <p className="text-gray-600 mb-6">
+                  <h3 className="text-2xl font-bold mb-4 text-white">Start Your Travel Adventure Today</h3>
+                  <p className="text-gray-300 mb-6">
                     Join thousands of satisfied travelers who have discovered the joy of stress-free travel planning with Velutara.
                   </p>
                   <GradientButton
@@ -493,13 +703,13 @@ export default function LandingPage() {
       </section>
 
       {/* FAQ Section */}
-      <section id="faq" className="py-16 bg-white">
+      <section id="faq" className="py-20 bg-[#020617] text-white">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <Typography variant="h2" component="h2" className="text-3xl sm:text-4xl font-bold mb-4">
               Frequently Asked Questions
             </Typography>
-            <p className="text-xl text-gray-600">
+            <p className="text-xl text-gray-300">
               Everything you need to know about Velutara
             </p>
           </div>
@@ -512,10 +722,16 @@ export default function LandingPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="bg-gray-50 rounded-lg p-6 shadow-sm"
+                className="
+                bg-white/5
+                backdrop-blur-lg
+                border border-white/10
+                rounded-lg
+                p-6
+                "
               >
-                <h3 className="text-lg font-semibold mb-2 text-gray-900">{item.question}</h3>
-                <p className="text-gray-600">{item.answer}</p>
+                <h3 className="text-lg font-semibold mb-2 text-white">{item.question}</h3>
+                <p className="text-gray-300">{item.answer}</p>
               </motion.div>
             ))}
           </div>
