@@ -10,13 +10,6 @@ import { sessionManager } from "@/src/services/sessionService"
 import Image from 'next/image'
 import Link from "next/link"
 
-interface Session {
-  id: string
-  title?: string
-  tagline?: string
-  updatedAt: string
-}
-
 export default function ChatLayout({ children }: { children: React.ReactNode }) {
   const [sessions, setSessions] = useState<ChatSession[]>([])
   const [loading, setLoading] = useState(false)
@@ -25,6 +18,14 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
   const [editingId, setEditingId] = useState<string | null>(null)
   const [titles, setTitles] = useState<Record<string, string>>({})
   const [sessionToDelete, setSessionToDelete] = useState<ChatSession | null>(null)
+  interface Session {
+    id: string
+    title?: string
+    tagline?: string
+    updatedAt: string
+  }
+  
+  const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
 
   const { isAuthenticated, user, logout } = useAuthStore()
   const router = useRouter()
@@ -82,6 +83,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
       setStartingNewChat(true)
       const newSession = await sessionManager.createSession()
       sessionStorage.setItem('activeSessionId', newSession.id)
+      setActiveSessionId(newSession.id);
       setLoading(false)
       setStartingNewChat(false)
     } catch (err) {
@@ -92,10 +94,20 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
   }
 
   const switchSession = (sessionId: string) => {
-    sessionStorage.setItem('activeSessionId', sessionId)
-    window.dispatchEvent(new CustomEvent('sessionSelected', { detail: sessionId }))
-    if (window.innerWidth < 1024) setSidebarOpen(false)
-  }
+    sessionStorage.setItem('activeSessionId', sessionId);
+  
+    // ✅ update local state biar sidebar highlight langsung berubah
+    setActiveSessionId(sessionId);
+  
+    // kirim event ke ChatPage biar load message session tsb
+    window.dispatchEvent(
+      new CustomEvent('sessionSelected', { detail: sessionId })
+    );
+  
+    if (window.innerWidth < 1024) {
+      setSidebarOpen(false);
+    }
+  };
 
   const handleTitleChange = (sessionId: string, value: string) => {
     setTitles((prev) => ({ ...prev, [sessionId]: value }))
@@ -143,7 +155,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
         />
       )}
 
-      <aside className={`fixed lg:relative z-30 lg:z-auto w-[280px] sm:w-[320px] lg:w-[25%] 
+      <aside className={`fixed lg:relative h-screen z-30 lg:z-auto w-[280px] sm:w-[320px] lg:w-[25%] 
         min-h-screen bg-white border-r shadow-md flex flex-col 
         transition-all duration-300 ease-in-out ${sidebarOpen ? 'left-0' : '-left-[320px] lg:left-0'}`}
       >
@@ -153,7 +165,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
             <Image src={"/android-chrome-512x512.png"} width={240} height={240} alt="logo" />
           </div>
           <Link href={"/dashboard"}>
-            <Typography variant="h1" className="text-xl font-bold">VELUTARA <span className="text-xl font-bold text-neutral-300">3.0</span></Typography>
+            <Typography variant="h1" className="text-xl font-bold">VELUTARA <span className="text-xl font-bold text-neutral-300">4.0</span></Typography>
           </Link>
           <button className="ml-auto text-gray-500 hover:text-gray-700 lg:hidden" onClick={() => setSidebarOpen(false)}>
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -184,11 +196,11 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
         </div>
 
         {/* Session List */}
-        <div className="mt-6 text-gray-600 px-6 flex-grow overflow-hidden flex flex-col">
+        <div className="mt-6 text-gray-600 px-6 flex-1 flex flex-col min-h-0">
           <div className="font-medium text-sm uppercase tracking-wider mb-3 text-gray-500">
             Recent Conversations
           </div>
-          <div className="max-h-[calc(100vh-380px)] overflow-y-auto space-y-3 pr-2 flex-grow">
+          <div className="flex-1 overflow-y-auto space-y-3 pr-2 min-h-0">
             {sessions.length === 0 ? (
               <div className="text-sm text-gray-500 italic p-4 text-center border border-dashed border-gray-200 rounded-lg">
                 No chat history yet
@@ -196,7 +208,13 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
             ) : sessions.map((session) => (
               <div
                 key={session.id}
-                className="py-3 px-4 hover:bg-purple-50 rounded-lg cursor-pointer transition-colors border border-gray-100 hover:border-purple-200 relative"
+                className={`
+                  py-3 px-4 rounded-lg cursor-pointer transition-all border relative
+                  ${activeSessionId === session.id
+                    ? "bg-purple-100 border-purple-400 shadow-sm"
+                    : "hover:bg-purple-50 border-gray-100 hover:border-purple-200"
+                  }
+                  `}
                 onClick={() => switchSession(session.id)}
               >
                 {/* Delete Button */}

@@ -9,6 +9,7 @@ import { useAuthStore } from '@/src/store/authStore'
 import { ChatSession } from '@/src/services/api'
 import { sessionManager } from '@/src/services/sessionService'
 import Link from 'next/link'
+import { deleteChatSession } from '@/src/services/api'
 
 export default function Dashboard() {
   const [sessions, setSessions] = useState<ChatSession[]>([])
@@ -17,6 +18,24 @@ export default function Dashboard() {
   const [activeTag, setActiveTag] = useState<string | null>(null)
   const { isAuthenticated, user, logout } = useAuthStore()
   const router = useRouter()
+  const [sessionToDelete, setSessionToDelete] = useState<ChatSession | null>(null)
+
+  const handleDeleteConfirmed = async () => {
+    if (!sessionToDelete) return
+  
+    try {
+      await deleteChatSession(sessionToDelete.id)
+  
+      sessionManager.removeSession(sessionToDelete.id)
+  
+      setSessions(prev => prev.filter(s => s.id !== sessionToDelete.id))
+  
+    } catch (err) {
+      console.error("Failed to delete session:", err)
+    }
+  
+    setSessionToDelete(null)
+  }
 
   // Load sessions on mount
   useEffect(() => {
@@ -145,9 +164,16 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen relative overflow-hidden 
+      bg-gradient-to-br from-indigo-50 via-purple-50 to-white">
+
+        <div className="pointer-events-none absolute -top-40 -left-40 w-[500px] h-[500px] 
+        bg-purple-300 opacity-20 blur-3xl rounded-full"/>
+
+        <div className="pointer-events-none absolute -bottom-40 -right-40 w-[500px] h-[500px] 
+        bg-indigo-300 opacity-20 blur-3xl rounded-full"/>
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
+      <header className="bg-white/70 backdrop-blur-lg shadow-sm border-b border-white/40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-3">
@@ -155,7 +181,7 @@ export default function Dashboard() {
                 <LogoIcon width={24} height={24} color="white" />
               </div>
               <div>
-                <Typography variant="h1" className="text-xl font-bold">Velutara <span className="text-xl font-bold text-neutral-300">3.0</span></Typography>
+                <Typography variant="h1" className="text-xl font-bold">Velutara <span className="text-xl font-bold text-neutral-300">4.0</span></Typography>
                 <Typography variant="body2" className="text-gray-500">Your travel AI assistant</Typography>
               </div>
             </div>
@@ -177,7 +203,7 @@ export default function Dashboard() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/40 overflow-hidden">
           {/* Dashboard Header */}
           <div className="p-6 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
@@ -260,7 +286,12 @@ export default function Dashboard() {
             {loading ? (
               <div className="p-12 text-center">
                 <div className="inline-block animate-spin h-8 w-8 border-t-2 border-b-2 border-purple-600 rounded-full"></div>
-                <p className="mt-2 text-gray-600">Loading your conversations...</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-6">
+                  {[...Array(6)].map((_, i) => (
+                    <div key={i}
+                      className="animate-pulse bg-gray-100 rounded-lg h-[120px]"/>
+                  ))}
+                </div>
               </div>
             ) : sessions.length === 0 ? (
               // Empty state
@@ -312,33 +343,71 @@ export default function Dashboard() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.3, delay: index * 0.05 }}
                       whileHover={{ y: -4, boxShadow: '0 12px 20px -10px rgba(0, 0, 0, 0.1)' }}
-                      className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:border-purple-300 transition-all cursor-pointer"
+                      className="
+                        group relative overflow-hidden
+                        bg-white/80 backdrop-blur
+                        rounded-xl border border-gray-200
+                        hover:border-transparent
+                        hover:shadow-xl
+                        transition-all duration-300
+                        cursor-pointer
+                      "
                       onClick={() => {
-                        // Store active session ID
-                        sessionStorage.setItem('activeSessionId', session.id);
-                        
-                        // Notify other components that a session was selected
-                        const event = new CustomEvent('sessionSelected', { detail: session.id });
-                        window.dispatchEvent(event);
-                        
-                        // Navigate to chat page
-                        router.push('/chat');
+                        sessionStorage.setItem('activeSessionId', session.id)
+                        window.dispatchEvent(
+                          new CustomEvent('sessionSelected', { detail: session.id })
+                        )
+                        router.push('/chat')
                       }}
                     >
+
+                      {/* 🗑️ DELETE BUTTON */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setSessionToDelete(session)
+                        }}
+                        className="
+                          absolute bottom-3 right-3
+                          z-20
+                          opacity-0 group-hover:opacity-100
+                          transition
+                          text-gray-400 hover:text-red-500
+                          bg-white/70 backdrop-blur
+                          rounded-md px-2 py-1
+                          shadow
+                        "
+                      >
+                        🗑️
+                      </button>
                       <div className="p-4">
                         <div className="flex justify-between items-start mb-3">
                           <div>
                             <h3 className="font-semibold text-gray-900 mb-1">
                               {session.title || "New Conversation"}
                             </h3>
-                            <div className="text-xs text-gray-500">{formatDate(session.updatedAt)}</div>
+                            <div className="text-xs text-gray-500">
+                              {formatDate(session.updatedAt)}
+                            </div>
                           </div>
-                        <span className="px-2 py-1 bg-gray-100 text-xs font-medium rounded-full text-gray-600">{tag}</span>
+
+                          <span className="px-2 py-1 bg-gray-100 text-xs font-medium rounded-full text-gray-600">
+                            {tag}
+                          </span>
                         </div>
-                        <p className="text-sm text-gray-600 line-clamp-2 mb-3">
-                          {generatePreviewText(session)}
-                        </p>
+
+                        <div className="mb-3">
+                          <div className="flex items-center text-xs text-purple-500 gap-1 mb-1">
+                            <span className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"/>
+                            Memory Saved
+                          </div>
+
+                          <p className="text-sm text-gray-600 line-clamp-2">
+                            {generatePreviewText(session)}
+                          </p>
+                        </div>
                       </div>
+
                     </motion.div>
                   );
                 })}
@@ -354,7 +423,7 @@ export default function Dashboard() {
           <div className="flex flex-col sm:flex-row justify-between items-center">
             <div className="mb-4 sm:mb-0">
               <p className="text-sm text-gray-500">
-                © 2025 Velutara. All rights reserved.
+                © 2026 Velutara. All rights reserved.
               </p>
             </div>
             <div className="flex space-x-6">
@@ -386,6 +455,31 @@ export default function Dashboard() {
           </div>
         </div>
       </footer>
+      {sessionToDelete && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+        <div className="bg-white rounded-xl p-6 shadow-xl w-[90%] max-w-sm">
+          <h2 className="text-lg font-semibold mb-2">Delete Chat?</h2>
+          <p className="text-sm text-gray-600 mb-4">
+            Are you sure you want to delete
+            <strong> {sessionToDelete.title || 'New Conversation'} </strong>?
+          </p>
+          <div className="flex justify-end gap-3">
+            <button
+              onClick={() => setSessionToDelete(null)}
+              className="px-4 py-2 text-sm border rounded"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleDeleteConfirmed}
+              className="px-4 py-2 text-sm bg-red-600 text-white rounded"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
     </div>
   )
 }

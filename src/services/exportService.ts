@@ -3,6 +3,25 @@ import * as XLSX from 'xlsx';
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 
+import { useAuthStore } from "../store/authStore";
+
+async function fetchPdfContext(sessionId: string) {
+  const token = useAuthStore.getState().token;
+
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_BACKEND}/api/chat/sessions/${sessionId}/pdf-context`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  if (!res.ok) throw new Error("Failed to fetch PDF context");
+  return res.json();
+}
+
+
 // ================== jsPDF + autoTable typing ==================
 interface JsPDFWithAutoTable extends jsPDF {
   autoTable: (options: {
@@ -355,51 +374,19 @@ function parseModeledItinerary(md: string): ParsedItinerary {
   // === Contextual info parsing ===
   const lines = md.split("\n").map(l => l.trim()).filter(Boolean);
 
-  for (const line of lines) {
-    // National Holidays
-    if (/^(?:\d+\.\s*)?\*?\*?National Holidays/i.test(line)) {
-      out.nationalDay = line.replace(/^(?:\d+\.\s*)?\*?\*?National Holidays[^:]*:\s*/i, "").trim();
-      // console.log("✔ NationalDay MATCH:", out.nationalDay);
-    } 
-    // Major Events
-    else if (/^(?:\d+\.\s*)?\*?\*?Major (Local )?Events/i.test(line)) {
-      out.majorEvent = line.replace(/^(?:\d+\.\s*)?\*?\*?Major (Local )?Events[^:]*:\s*/i, "").trim();
-      // console.log("✔ MajorEvent MATCH:", out.majorEvent);
-    } 
-    // Weather
-    else if (/^(?:\d+\.\s*)?\*?\*?Typical Weather Forecast/i.test(line)) {
-      out.weather = line.replace(/^(?:\d+\.\s*)?\*?\*?Typical Weather Forecast[^:]*:\s*/i, "").trim();
-      // console.log("✔ Weather MATCH:", out.weather);
-    } 
-    // News
-    else if (/^(?:\d+\.\s*)?\*?\*?Latest News Update/i.test(line)) {
-      out.news = line.replace(/^(?:\d+\.\s*)?\*?\*?Latest News Update[^:]*:\s*/i, "").trim();
-      // console.log("✔ News MATCH:", out.news);
-    }
-  }
+  // === Contextual info parsing from ASSISTANT OUTPUT (not system prompt) ===
+  const fullText = md.replace(/\r/g, "");
 
-  // Fallback supaya ga kosong
-  if (!out.majorEvent) {
-    // console.log("⚠ MajorEvent NOT FOUND");
-    out.majorEvent = "Not specified";
-  }
-  if (!out.nationalDay) {
-    // console.log("⚠ NationalDay NOT FOUND");
-    out.nationalDay = "Not specified";
-  }
-  if (!out.weather) {
-    // console.log("⚠ Weather NOT FOUND");
-    out.weather = "Not specified";
-  }
-  if (!out.news) {
-    // console.log("⚠ News NOT FOUND");
-    out.news = "Not specified";
-  }
+  // Kamu boleh tambah parser di sini kalau mau,
+  // tapi untuk sekarang kita pakai fallback saja
+
+  out.majorEvent ||= "Not specified";
+  out.nationalDay ||= "Not specified";
+  out.weather ||= "Not specified";
+  out.news ||= "Not specified";
 
   return out;
 }
-
-
 
 
 function extractConversationMeta(
@@ -449,8 +436,9 @@ function extractConversationMeta(
 }
 
 
-export function exportModeledItineraryToPDF(
+export async function exportModeledItineraryToPDF(
   messages: Array<{ sender?: string; role?: string; text?: string; content?: string }>,
+  sessionId: string,
   filename = "itinerary.pdf"
 ) {
   const allMd = collectAssistantText(messages);
@@ -458,6 +446,18 @@ export function exportModeledItineraryToPDF(
 
   const parsed = parseModeledItinerary(allMd);
   const meta = extractConversationMeta(messages, parsed.title);
+
+  const context = await fetchPdfContext(sessionId);
+
+  // Override hasil parsing dengan data backend
+  parsed.nationalDay = context.holidaySummary || parsed.nationalDay;
+  parsed.news = context.disasterSummary || parsed.news;
+
+  meta.dates = context.tripStart && context.tripEnd
+    ? `${context.tripStart} - ${context.tripEnd}`
+    : meta.dates;
+
+  meta.destination = context.tripCountry || meta.destination;
 
   const doc = new jsPDF({ orientation: "landscape" }) as JsPDFWithAutoTable;
   const pageWidth = doc.internal.pageSize.getWidth();
@@ -667,4 +667,35 @@ export function exportModeledItineraryToPDF(
 
   // ===== SAVE FILE =====
   doc.save(filename.endsWith(".pdf") ? filename : `${filename}.pdf`);
+  
+}
+
+export async function downloadBackendPDF(sessionId: string) {
+
+  const token = useAuthStore.getState().token;
+
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_BACKEND}/api/chat/sessions/${sessionId}/export-pdf`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }
+  );
+
+  if (!res.ok) {
+    throw new Error("PDF download failed");
+  }
+
+  const blob = await res.blob();
+
+  const url = window.URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `Travel-Itinerary-${sessionId}.pdf`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
 }

@@ -12,7 +12,8 @@ import {
 } from "@/src/utils/chatUtils";
 import ChatMessageComponent from "@/src/components/ChatMessage";
 import FileUploadButton from "@/src/components/FileUploadButton";
-import { exportModeledItineraryToPDF } from "@/src/services/exportService";
+// import { exportModeledItineraryToPDF } from "@/src/services/exportService";
+import { downloadBackendPDF } from "@/src/services/exportService";
 
 export default function ChatPage() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -45,6 +46,29 @@ export default function ChatPage() {
     "Suggest a 7-day Cairo historical journey",
     "Suggest a 5-day Singapore innovation tour"
   ];
+
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const autoResize = () => {
+    const el = textareaRef.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = el.scrollHeight + "px";
+  };
+
+  const [itineraryReady, setItineraryReady] = useState(false);
+
+  useEffect(() => {
+    const lastBot = messages
+      .filter(m => m.sender === "bot")
+      .pop();
+  
+    if (!lastBot) return;
+  
+    if (lastBot.text.includes("<itinerary_table>")) {
+      setItineraryReady(true);
+    }
+  }, [messages]);
   
   
   // Handle authentication and initialization
@@ -108,39 +132,71 @@ export default function ChatPage() {
   }, [messages.length]); // Re-establish when messages change or session changes
   
   // Set up message listener for the active session
-  useEffect(() => {
-    // Only setup listener when we have an active session
-    if (sessionManager.getCurrentSessionId()) {
-      const cleanup = sessionManager.setupMessageListener(
-        // Handle message chunk
-        (msg: string) => {
-          // Append to current message
-          setCurrentBotMessage(prev => prev + msg);
-          
-          // Scroll to bottom
-          if (containerRef.current) {
-            containerRef.current.scrollTo({
-              top: containerRef.current.scrollHeight,
-              behavior: 'smooth'
-            });
+  // ⭐ STREAM + LOADING BUBBLE HANDLER
+useEffect(() => {
+  if (!sessionManager.getCurrentSessionId()) return;
+
+  return sessionManager.setupMessageListener(
+
+    // CHUNK
+    (msg: string) => {
+
+      // 🟣 Loading bubble dari backend
+      if (msg.startsWith("__LOADING__")) {
+        const loadingText = msg.replace("__LOADING__", "").trim();
+
+        setMessages(prev => {
+          const last = prev[prev.length - 1];
+
+          // Update bubble loading terakhir
+          if (last?.sender === "bot-loading") {
+            return [
+              ...prev.slice(0, -1),
+              { sender: "bot-loading", text: loadingText }
+            ];
           }
-        },
-        // Handle message complete
-        () => {
-          // Add complete message to list and clear current
-          setCurrentBotMessage(prevMsg => {
-            if (prevMsg.trim() !== "") {
-              setMessages(prev => [...prev, { sender: "bot", text: prevMsg }]);
+
+          // Buat bubble loading baru
+          return [...prev, { sender: "bot-loading", text: loadingText }];
+        });
+
+        return; // stop supaya ga masuk ke streaming normal
+      }
+
+      // ⚪ Normal streaming jawaban AI
+      setCurrentBotMessage(prev => prev + msg);
+
+      if (containerRef.current) {
+        containerRef.current.scrollTo({
+          top: containerRef.current.scrollHeight,
+          behavior: "smooth"
+        });
+      }
+    },
+
+    // COMPLETE (jawaban final selesai)
+    () => {
+      setCurrentBotMessage(prevMsg => {
+        if (prevMsg.trim() !== "") {
+          setMessages(prev => {
+            const last = prev[prev.length - 1];
+
+            // Replace loading bubble → jawaban final
+            if (last?.sender === "bot-loading") {
+              return [
+                ...prev.slice(0, -1),
+                { sender: "bot", text: prevMsg }
+              ];
             }
-            return "";
+
+            return [...prev, { sender: "bot", text: prevMsg }];
           });
         }
-      );
-      
-      // Return cleanup function
-      return cleanup;
+        return "";
+      });
     }
-  }, [messages.length]); // Re-establish listener when messages change
+  );
+}, [messages.length]);
   
   // Handle session switching from external sources
   useEffect(() => {
@@ -166,6 +222,10 @@ export default function ChatPage() {
         await sessionManager.switchSession(sessionId, (loadedMessages) => {
           setMessages(loadedMessages);
           setCurrentBotMessage("");
+        
+          setItineraryReady(
+            loadedMessages.some(m => m.text.includes("<itinerary_table>"))
+          );
         });
         setLoading(false);
       } catch (err) {
@@ -193,6 +253,9 @@ export default function ChatPage() {
       
       // Clear input
       setInput("");
+      if (textareaRef.current) {
+        textareaRef.current.style.height = "auto";
+      }
       
       // Hide prompts after sending
       setShowPrompts(false);
@@ -271,6 +334,7 @@ export default function ChatPage() {
       // Clear messages
       setMessages([]);
       setCurrentBotMessage("");
+      setItineraryReady(false);
       // Reset title and tagline for new chat
       setSessionTitle("Travel Assistant");
       setSessionTagline("");
@@ -340,12 +404,13 @@ export default function ChatPage() {
       {/* Chat Messages */}
       <div
         ref={containerRef}
-        className="flex-grow flex flex-col gap-3 p-4 overflow-y-auto bg-gray-50"
-        style={{ height: 'calc(100vh - 180px)' }}
+        className="flex-grow flex flex-col gap-3 p-4 overflow-y-auto bg-gradient-to-b from-indigo-50 to-white"
       >
-        {messages.map((msg, i) => (
-          <ChatMessageComponent key={i} message={msg} />
-        ))}
+        {messages
+          .filter((msg) => msg.sender !== "bot-loading")
+          .map((msg, i) => (
+            <ChatMessageComponent key={i} message={msg} />
+          ))}
         
         {currentBotMessage && (
           <div className="max-w-full sm:max-w-[85%] md:max-w-3xl mr-auto">
@@ -358,7 +423,16 @@ export default function ChatPage() {
                 <span className="ml-2 font-normal text-xs sm:text-sm text-gray-500">typing...</span>
               </h3>
             </div>
-            <div className="mt-1 p-3 sm:p-4 rounded-lg bg-white text-gray-700 shadow-sm">
+            <div className="
+                  mt-1 p-4 
+                  rounded-2xl 
+                  bg-gradient-to-br from-white to-indigo-50
+                  border border-indigo-100
+                  shadow-md
+                  backdrop-blur-sm
+                  text-gray-800
+                  transition
+                  ">
               <Markdown  
                 components={{
                   table: ({ ...props }) => (
@@ -513,12 +587,16 @@ export default function ChatPage() {
               </div>
             )}
             
-            <input
-              type="text"
+            <textarea
+              ref={textareaRef}
+              rows={1}
               placeholder="Ask about travel destinations..."
-              className="flex-1 p-2 outline-none text-sm sm:text-base"
+              className="flex-1 resize-none p-2 outline-none text-sm sm:text-base max-h-40"
               value={input}
-              onChange={(e) => setInput(e.target.value)}
+              onChange={(e) => {
+                setInput(e.target.value);
+                autoResize();
+              }}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();
@@ -546,31 +624,32 @@ export default function ChatPage() {
         </div>
       </div>
 
-      
-      <div className="hidden lg:flex justify-between p-4 text-lg font-bold shadow-sm bg-white">
-        <div>
-          <header>{sessionTitle}</header>
-          {sessionTagline && <p className="text-sm font-normal text-gray-500">{sessionTagline}</p>}
-        </div>
 
-        <div className="flex items-center gap-2">
-          <span className="text-sm bg-green-100 text-green-600 px-2 py-1 rounded-full">Connected</span>
-
-          {/* Export Modeled Itinerary (sesuai sys-new.txt) */}
+      {itineraryReady && (
+        <div className="fixed bottom-24 right-6 z-50">
           <button
             onClick={() =>
-              exportModeledItineraryToPDF(
-                // kirim raw messages; parser akan ambil pesan bot terbaru yg berisi itinerary modeled
-                messages.map(m => ({ sender: m.sender, text: m.text })),
-                `velutara-itinerary-${sessionManager.getCurrentSessionId()}.pdf`,
+              downloadBackendPDF(
+                sessionManager.getCurrentSessionId()
               )
             }
-            className="px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded text-sm"
+            className="
+            flex items-center gap-2
+            px-6 py-3
+            bg-indigo-600
+            hover:bg-indigo-700
+            text-white
+            rounded-full
+            shadow-xl shadow-indigo-300/50
+            transition
+            animate-[fadeInUp_0.4s_ease-out]
+            "
           >
-            Export Itinerary (PDF)
+            📄 Download Itinerary
           </button>
         </div>
-      </div>
+      )}
+
     </div>
   );
 }

@@ -317,6 +317,42 @@ public async loadSession(sessionId: string): Promise<ChatMessage[]> {
   }
   
   /**
+ * Remove a session from storage + notify sidebar/dashboard
+ */
+  public removeSession(sessionId: string): void {
+    if (typeof window === 'undefined') return;
+
+    try {
+      const sessionsJSON = sessionStorage.getItem('chatSessions')
+      if (!sessionsJSON) return
+
+      const sessions: ChatSession[] = JSON.parse(sessionsJSON)
+
+      const updatedSessions = sessions.filter(
+        s => s.id !== sessionId
+      )
+
+      sessionStorage.setItem(
+        'chatSessions',
+        JSON.stringify(updatedSessions)
+      )
+
+      this.notifySessionsUpdated(updatedSessions)
+
+      const activeSessionId =
+        sessionStorage.getItem('activeSessionId')
+
+      if (activeSessionId === sessionId) {
+        sessionStorage.setItem('activeSessionId', '')
+        this.setCurrentSessionId('')
+      }
+
+    } catch (e) {
+      console.error('removeSession failed:', e)
+    }
+  }
+
+  /**
    * Clean up the session manager
    */
   public cleanup(): void {
