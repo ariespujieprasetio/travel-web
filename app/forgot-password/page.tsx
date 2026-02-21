@@ -12,20 +12,16 @@ export default function ForgotPasswordPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   
-  // Get token and email from URL if present
   const token = searchParams.get('token')
   const email = searchParams.get('email')
   
-  // Set the mode based on whether token and email are present
   const [mode, setMode] = useState<'request' | 'reset' | 'complete'>('request')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
   
-  // Form state for request mode
   const [requestEmail, setRequestEmail] = useState(email || '')
   
-  // Form state for reset mode
   const [resetForm, setResetForm] = useState({
     email: email || '',
     token: token || '',
@@ -33,7 +29,6 @@ export default function ForgotPasswordPage() {
     confirmPassword: ''
   })
   
-  // Validate token if provided
   useEffect(() => {
     const validateToken = async () => {
       if (token && email) {
@@ -51,7 +46,7 @@ export default function ForgotPasswordPage() {
             setMode('request')
           }
         } catch (err) {
-          setError('Failed to validate reset token. Please request a new password reset link.' + String(err),)
+          setError('Failed to validate reset token. Please request a new password reset link.' + String(err))
           setMode('request')
         } finally {
           setLoading(false)
@@ -62,7 +57,6 @@ export default function ForgotPasswordPage() {
     validateToken()
   }, [token, email])
   
-  // Handle request form submission
   const handleRequestSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
@@ -82,20 +76,17 @@ export default function ForgotPasswordPage() {
     }
   }
   
-  // Handle reset form submission
   const handleResetSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError(null)
     
-    // Validate passwords match
     if (resetForm.newPassword !== resetForm.confirmPassword) {
       setError('Passwords do not match')
       setLoading(false)
       return
     }
     
-    // Validate password length
     if (resetForm.newPassword.length < 8) {
       setError('Password must be at least 8 characters long')
       setLoading(false)
@@ -129,19 +120,23 @@ export default function ForgotPasswordPage() {
   }
   
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 px-6">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 px-6 py-16">
+      
+      <div className="absolute -top-40 -right-40 h-[400px] w-[400px] rounded-full bg-indigo-600/30 blur-3xl" />
+      <div className="absolute -bottom-40 -left-40 h-[400px] w-[400px] rounded-full bg-purple-600/30 blur-3xl" />
+
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center">
           <div className="w-12 h-12 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 flex items-center justify-center">
             <LogoIcon width={28} height={28} color="white" />
           </div>
         </div>
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+        <h2 className="mt-6 text-center text-3xl font-extrabold text-white">
           {mode === 'request' && 'Reset your password'}
           {mode === 'reset' && 'Create new password'}
           {mode === 'complete' && 'Password reset complete'}
         </h2>
-        <p className="mt-2 text-center text-gray-600 max-w">
+        <p className="mt-2 text-center text-gray-400 max-w">
           {mode === 'request' && "Enter your email and we'll send you a link to reset your password"}
           {mode === 'reset' && "Enter your new password below"}
           {mode === 'complete' && "Your password has been successfully reset"}
@@ -149,20 +144,21 @@ export default function ForgotPasswordPage() {
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-6 shadow rounded-lg sm:px-10">
+        <div className="relative w-full max-w-md rounded-2xl border border-white/10 bg-white/10 backdrop-blur-xl shadow-2xl px-8 py-10">
+          
           {error && (
-            <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-md">
+            <div className="mb-4 p-3 bg-red-500/10 text-red-400 border border-red-500/20 rounded-md">
               {error}
             </div>
           )}
           
           {success && mode === 'request' && (
             <div className="p-6 text-center">
-              <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-emerald-500/10 text-emerald-400 rounded-full flex items-center justify-center mx-auto mb-4">
                 <FaEnvelope size={24} />
               </div>
-              <h3 className="text-xl font-semibold mb-2">Check Your Email</h3>
-              <p className="text-gray-600 mb-6">
+              <h3 className="text-xl font-semibold mb-2 text-white">Check Your Email</h3>
+              <p className="text-gray-400 mb-6">
                 If we found an account associated with {requestEmail}, we&apos;ve sent instructions to reset your password.
               </p>
               <p className="text-sm text-gray-500">
@@ -174,12 +170,12 @@ export default function ForgotPasswordPage() {
           {mode === 'request' && !success && (
             <form className="space-y-6" onSubmit={handleRequestSubmit}>
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">
                   Email address
                 </label>
                 <div className="mt-1 relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <FaEnvelope className="h-5 w-5 text-gray-400" />
+                    <FaEnvelope className="h-5 w-5 text-gray-500/70" />
                   </div>
                   <input
                     id="email"
@@ -189,7 +185,7 @@ export default function ForgotPasswordPage() {
                     required
                     value={requestEmail}
                     onChange={(e) => setRequestEmail(e.target.value)}
-                    className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                    className="block w-full pl-10 pr-3 py-3 bg-white/5 border border-white/10 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
                     placeholder="your@email.com"
                     disabled={loading}
                   />
@@ -211,12 +207,12 @@ export default function ForgotPasswordPage() {
           {mode === 'reset' && (
             <form className="space-y-6" onSubmit={handleResetSubmit}>
               <div>
-                <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="newPassword" className="block text-sm font-medium text-gray-300 mb-1">
                   New Password
                 </label>
                 <div className="mt-1 relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <FaLock className="h-5 w-5 text-gray-400" />
+                    <FaLock className="h-5 w-5 text-gray-500/70" />
                   </div>
                   <input
                     id="newPassword"
@@ -226,7 +222,7 @@ export default function ForgotPasswordPage() {
                     required
                     value={resetForm.newPassword}
                     onChange={handleResetInputChange}
-                    className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                    className="block w-full pl-10 pr-3 py-3 bg-white/5 border border-white/10 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
                     placeholder="••••••••"
                     disabled={loading}
                   />
@@ -237,12 +233,12 @@ export default function ForgotPasswordPage() {
               </div>
 
               <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-300 mb-1">
                   Confirm New Password
                 </label>
                 <div className="mt-1 relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <FaLock className="h-5 w-5 text-gray-400" />
+                    <FaLock className="h-5 w-5 text-gray-500/70" />
                   </div>
                   <input
                     id="confirmPassword"
@@ -252,7 +248,7 @@ export default function ForgotPasswordPage() {
                     required
                     value={resetForm.confirmPassword}
                     onChange={handleResetInputChange}
-                    className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                    className="block w-full pl-10 pr-3 py-3 bg-white/5 border border-white/10 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
                     placeholder="••••••••"
                     disabled={loading}
                   />
@@ -276,11 +272,11 @@ export default function ForgotPasswordPage() {
           
           {mode === 'complete' && (
             <div className="p-6 text-center">
-              <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-emerald-500/10 text-emerald-400 rounded-full flex items-center justify-center mx-auto mb-4">
                 <FaCheckCircle size={24} />
               </div>
-              <h3 className="text-xl font-semibold mb-2">Password Reset Complete</h3>
-              <p className="text-gray-600 mb-6">
+              <h3 className="text-xl font-semibold mb-2 text-white">Password Reset Complete</h3>
+              <p className="text-gray-400 mb-6">
                 Your password has been successfully reset. You can now log in with your new password.
               </p>
               <GradientButton
@@ -295,17 +291,17 @@ export default function ForgotPasswordPage() {
           <div className="mt-6">
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300"></div>
+                <div className="w-full border-t border-white/10"></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">
+                <span className="px-2 bg-transparent text-gray-500">
                   Or
                 </span>
               </div>
             </div>
 
             <div className="mt-6 text-center">
-              <Link href="/login" className="font-medium text-purple-600 hover:text-purple-500">
+              <Link href="/login" className="font-medium text-indigo-400 hover:text-indigo-300">
                 Return to login
               </Link>
             </div>
