@@ -336,8 +336,51 @@ useEffect(() => {
       </div>
 
       {/* Right side with login form */}
-      <div className="w-full md:w-1/2 flex items-center justify-center p-8">
-        <div className="max-w-md w-full">
+      <div className="
+        w-full md:w-1/2
+        flex items-center justify-center
+        p-8
+        bg-gradient-to-br from-[#020617] via-[#020617] to-[#030a25]
+        relative
+        text-white
+        overflow-hidden
+        ">
+        <div className="pointer-events-none absolute inset-0 -z-10">
+
+      <div className="
+        absolute
+        w-[700px] h-[700px]
+        bg-purple-600/20
+        blur-[200px]
+        top-[-200px] right-[-200px]
+      " />
+
+      <div className="
+        absolute
+        w-[600px] h-[600px]
+        bg-indigo-600/20
+        blur-[180px]
+        bottom-[-200px] left-[-200px]
+      " />
+
+      </div>
+      <div className="
+        max-w-md w-full
+        bg-white/[0.04]
+        backdrop-blur-2xl
+        border border-white/10
+        rounded-2xl
+        p-8
+        shadow-[0_0_60px_rgba(99,102,241,0.25)]
+        relative
+        before:absolute
+        before:inset-0
+        before:rounded-2xl
+        before:bg-gradient-to-br
+        before:from-purple-500/10
+        before:to-indigo-500/5
+        before:pointer-events-none
+        ">
           {/* Mobile Logo (visible only on mobile) */}
           <div className="flex items-center justify-center md:hidden mb-8">
             <LogoIcon width={36} height={36} color="#6366F1" />
@@ -350,7 +393,11 @@ useEffect(() => {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
-              className="text-3xl font-bold mb-2 text-gray-800"
+              className="
+              text-3xl font-bold mb-2
+              bg-gradient-to-r from-purple-400 via-indigo-400 to-blue-400
+              text-transparent bg-clip-text
+              "
             >
               {isLogin ? 'Welcome back!' : 'Create your account'}
             </motion.h2>
@@ -359,17 +406,31 @@ useEffect(() => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.3, delay: 0.1 }}
-              className="text-gray-600"
+              className="text-gray-300"
             >
               {isLogin ? 'Log in to access your travel plans' : 'Start planning your dream trips with Velutara'}
             </motion.p>
           </div>
 
           {/* Tab switching */}
-          <div className="bg-gray-100 rounded-lg p-1 mb-8 flex relative">
+          <div className="
+          bg-white/[0.03]
+          border border-white/10
+          backdrop-blur-md
+          rounded-lg
+          p-1 mb-8
+          flex relative
+          ">
             {/* Animated highlight */}
             <motion.div
-              className="absolute top-1 bottom-1 rounded-md bg-white shadow-sm z-0"
+              className="
+              absolute top-1 bottom-1 rounded-md
+              bg-gradient-to-r
+              from-purple-500
+              to-indigo-500
+              shadow-lg
+              z-0
+              "
               initial={false}
               animate={{
                 x: isLogin ? '100%' : '0%',
@@ -379,15 +440,22 @@ useEffect(() => {
             />
 
             <button
-              className={`w-1/2 py-2 rounded-md text-sm font-medium transition-colors z-10 relative ${!isLogin ? 'text-gray-800' : 'text-gray-600'
-                }`}
+              className={`w-1/2 py-2 rounded-md text-sm font-medium transition-all duration-300 z-10 relative ${
+                !isLogin
+                  ? 'text-white'
+                  : 'text-gray-400 hover:text-gray-200'
+              }`}
               onClick={() => setIsLogin(false)}
             >
               Sign Up
             </button>
+
             <button
-              className={`w-1/2 py-2 rounded-md text-sm font-medium transition-colors z-10 relative ${isLogin ? 'text-gray-800' : 'text-gray-600'
-                }`}
+              className={`w-1/2 py-2 rounded-md text-sm font-medium transition-all duration-300 z-10 relative ${
+                isLogin
+                  ? 'text-white'
+                  : 'text-gray-400 hover:text-gray-200'
+              }`}
               onClick={() => setIsLogin(true)}
             >
               Log In
@@ -417,7 +485,7 @@ useEffect(() => {
               <form onSubmit={handleSubmit} className="space-y-4">
                 {!isLogin && (
                   <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-1">
                       Full Name
                     </label>
                     <div className="relative">
@@ -434,14 +502,27 @@ useEffect(() => {
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
                         required
                         placeholder="John Doe"
-                        className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 shadow-sm"
-                      />
+                        className="
+                        block w-full pl-10 pr-3 py-3
+                      bg-white/[0.05]
+                      focus:bg-white/[0.08]
+                        border border-white/10
+                        text-white
+                        placeholder:text-gray-400
+                        rounded-lg
+                        backdrop-blur-md
+                        focus:outline-none
+                        focus:ring-2 focus:ring-purple-500
+                        focus:border-purple-500
+                        shadow-[0_0_20px_rgba(139,92,246,0.15)]
+                        transition
+                        "                      />
                     </div>
                   </div>
                 )}
 
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">
                     Email Address
                   </label>
                   <div className="relative">
@@ -459,13 +540,27 @@ useEffect(() => {
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
                       required
                       placeholder="your@email.com"
-                      className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 shadow-sm"
+                      className="
+                      block w-full pl-10 pr-3 py-3
+                      bg-white/[0.05]
+                      focus:bg-white/[0.08]
+                      border border-white/10
+                      text-white
+                      placeholder:text-gray-400
+                      rounded-lg
+                      backdrop-blur-md
+                      focus:outline-none
+                      focus:ring-2 focus:ring-purple-500
+                      focus:border-purple-500
+                      shadow-[0_0_20px_rgba(139,92,246,0.15)]
+                      transition
+                      "
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-1">
                     Password
                   </label>
                   <div className="relative">
@@ -483,7 +578,21 @@ useEffect(() => {
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
                       required
                       placeholder="••••••••"
-                      className="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 shadow-sm"
+                      className="
+                      block w-full pl-10 pr-10 py-3
+                    bg-white/[0.05]
+                    focus:bg-white/[0.08]
+                      border border-white/10
+                      text-white
+                      placeholder:text-gray-400
+                      rounded-lg
+                      backdrop-blur-md
+                      focus:outline-none
+                      focus:ring-2 focus:ring-purple-500
+                      focus:border-purple-500
+                      shadow-[0_0_20px_rgba(139,92,246,0.15)]
+                      transition
+                      "
                     />
                     <button
                       type="button"
@@ -520,7 +629,7 @@ useEffect(() => {
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRememberMe(e.target.checked)}
                         className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
                       />
-                      <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
+                      <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-300">
                         Remember me
                       </label>
                     </div>
@@ -553,10 +662,10 @@ useEffect(() => {
 
                 <div className="relative mt-6">
                   <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-gray-300" />
+                  <div className="w-full border-t border-white/10" />
                   </div>
                   <div className="relative flex justify-center text-sm">
-                    <span className="bg-white px-2 text-gray-500">or</span>
+                  <span className="bg-[#020617] px-2 text-gray-400">or</span>
                   </div>
                 </div>
                 <div ref={googleBtnRef} className="mt-6 full" />
@@ -568,7 +677,7 @@ useEffect(() => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
-            className="mt-6 text-center text-sm text-gray-600"
+            className="mt-6 text-center text-sm text-gray-400"
           >
             {isLogin ? "Don't have an account? " : "Already have an account? "}
             <button
@@ -585,9 +694,8 @@ useEffect(() => {
             transition={{ delay: 0.4 }}
             className="mt-8 text-center text-xs text-gray-500"
           >
-            Lorem ipsum dolor sit amet consectetur.
-            <a href="/terms" className="underline hover:text-gray-700">Terms of Service</a> and{' '}
-            <a href="/privacy" className="underline hover:text-gray-700">Privacy Policy</a>.
+            <a href="/terms" className="underline hover:text-gray-300">Terms of Service</a> and{' '}
+            <a href="/privacy" className="underline hover:text-gray-300">Privacy Policy</a>.
           </motion.p>
         </div>
       </div>
